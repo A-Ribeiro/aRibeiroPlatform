@@ -1,0 +1,20 @@
+############################################################################
+# Compile with fast rsqrt
+############################################################################
+set(ARIBEIRO_FAST_RSQRT OFF CACHE BOOL "Turn on RSQRT optimization.")
+if (ARIBEIRO_FAST_RSQRT)
+    add_definitions(-DARIBEIRO_FAST_RSQRT)
+    if (ARIBEIRO_SSE2)
+        message(STATUS "**************************************")
+        message(STATUS "* FAST RSQRT - USING SSE INSTRUCTION *")
+        message(STATUS "**************************************")
+    else()
+        message(STATUS "***************************")
+        message(STATUS "* FAST RSQRT - USING SOFT *")
+        message(STATUS "***************************")
+    endif()
+else()
+    message(STATUS "*************************")
+    message(STATUS "* FAST RSQRT - DISABLED *")
+    message(STATUS "*************************")
+endif()
