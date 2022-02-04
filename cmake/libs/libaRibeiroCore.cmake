@@ -22,5 +22,5 @@ if (LIB_ARIBEIROCORE STREQUAL FromGit)
     unset(supress_show_info)
 
 else()
-    message(FATAL_ERROR "You need to select the source of the librandom." )
+    message(FATAL_ERROR "You need to select the source of the aRibeiroCore." )
 endif()

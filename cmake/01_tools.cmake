@@ -211,10 +211,31 @@ macro(tool_download_lib_package REPOSITORY_URL LIBNAME)
     endif()
 endmacro()
 
+
+set( lib_list "" CACHE INTERNAL "lib_lists")
+mark_as_internal(lib_list)
+
 macro(tool_include_lib LIBNAME)
     #add_subdirectory("${CMAKE_HOME_DIRECTORY}/libs/${LIBNAME}" "${CMAKE_BINARY_DIR}/bin/${LIBNAME}")
     #add_subdirectory("${CMAKE_HOME_DIRECTORY}/libs/${LIBNAME}" "${CMAKE_CURRENT_BINARY_DIR}/${LIBNAME}")
-    add_subdirectory("${CMAKE_HOME_DIRECTORY}/libs/${LIBNAME}" "${CMAKE_BINARY_DIR}/${LIBNAME}")
+
+    #get_property(aux GLOBAL PROPERTY BUILDSYSTEM_TARGETS)
+    #get_directory_property(aux BUILDSYSTEM_TARGETS)
+    
+    if (NOT "${LIBNAME}" IN_LIST lib_list)
+        
+        list(APPEND lib_list ${LIBNAME})
+        set( lib_list ${lib_list} CACHE INTERNAL "lib_lists" FORCE)
+
+        #message("Add new Lib: ${lib_list}")
+
+        add_subdirectory("${CMAKE_HOME_DIRECTORY}/libs/${LIBNAME}" "${CMAKE_BINARY_DIR}/${LIBNAME}")
+    endif()
+    
+    
+
+    
+    
 endmacro()
 
 
