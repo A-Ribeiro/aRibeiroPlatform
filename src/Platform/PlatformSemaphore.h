@@ -61,6 +61,11 @@
     #include <signal.h>
     #include <errno.h>
 
+    #if defined(OS_TARGET_mac)
+        // for unamed semaphores on mac
+        #include <dispatch/dispatch.h>
+    #endif
+
 #else
     #error Semaphore for this platform is not implemented...
 #endif
@@ -74,8 +79,10 @@ namespace aRibeiro {
 
     #if defined(OS_TARGET_win)
         HANDLE semaphore;
-    #elif defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
+    #elif defined(OS_TARGET_linux) 
         sem_t semaphore;
+    #elif defined(OS_TARGET_mac)
+        dispatch_semaphore_t semaphore;
     #endif
 
         //private copy constructores, to avoid copy...
@@ -93,8 +100,10 @@ namespace aRibeiro {
                 NULL            // unnamed semaphore
             );
             ARIBEIRO_ABORT(semaphore == NULL, "CreateSemaphore error: %s\n", _GetLastErrorToString_semaphore().c_str());
-    #elif defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
+    #elif defined(OS_TARGET_linux)
             sem_init(&semaphore, 0, count);// 0 means is a semaphore bound to threads
+    #elif defined(OS_TARGET_mac)
+            semaphore = dispatch_semaphore_create(count);
     #endif
         }
         virtual ~PlatformSemaphore(){
@@ -102,8 +111,10 @@ namespace aRibeiro {
             if (semaphore != NULL)
                 CloseHandle(semaphore);
             semaphore = NULL;
-    #elif defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
+    #elif defined(OS_TARGET_linux)
             sem_destroy(&semaphore);
+    #elif defined(OS_TARGET_mac)
+            dispatch_release(semaphore);
     #endif
         }
 
@@ -191,23 +202,17 @@ namespace aRibeiro {
     #elif defined(OS_TARGET_mac)
             if (timeout_ms == 0) {
                 currentThread->semaphoreUnLock();
-                return sem_trywait(&semaphore) == 0;
+                //return sem_trywait(&semaphore) == 0;
+                return dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, 0)) == 0;
             }
 
-            currentThread->semaphoreWaitBegin(&semaphore);
+            currentThread->semaphoreWaitBegin(NULL);
             currentThread->semaphoreUnLock();
 
-            int s = -1;
-            int timeout_int = (int)timeout_ms;
-            while(!currentThread->isCurrentThreadInterrupted() && timeout_int > 0) {
-                s = sem_trywait(&semaphore);
-                if (s == 0)
-                    break;
-                timeout_int -= 1;
-                PlatformSleep::sleepMillis(1);
-            }
+            uint64_t timeout = NSEC_PER_MSEC * timeout_ms;
+            long s = dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, timeout));
 
-            currentThread->semaphoreWaitDone(&semaphore);
+            currentThread->semaphoreWaitDone(NULL);
 
             return s == 0;
     #endif
@@ -226,7 +231,7 @@ namespace aRibeiro {
             else
                 while (!signaled && !tryToAcquire(UINT32_MAX));
             return !signaled;*/
-#elif defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
+#elif defined(OS_TARGET_linux)
 
             aRibeiro::PlatformThread *currentThread = aRibeiro::PlatformThread::getCurrentThread();
 
@@ -261,6 +266,43 @@ namespace aRibeiro {
             }
 
             return !signaled;
+
+#elif defined(OS_TARGET_mac)
+
+            aRibeiro::PlatformThread *currentThread = aRibeiro::PlatformThread::getCurrentThread();
+
+            /*
+            currentThread->semaphoreLock();
+            if (signaled || currentThread->isCurrentThreadInterrupted()) {
+                signaled = true;
+                currentThread->semaphoreUnLock();
+            } else {
+                currentThread->semaphoreWaitBegin(&semaphore);
+                currentThread->semaphoreUnLock();
+                signaled = signaled || (sem_wait(&semaphore) != 0);
+                currentThread->semaphoreWaitDone(&semaphore);
+                //signaled = signaled || currentThread->isCurrentThreadInterrupted();
+            }
+            */
+
+            currentThread->semaphoreLock();
+            
+            bool signaled = isSignaled();
+
+            if (signaled) {
+                //signaled = true;
+                currentThread->semaphoreUnLock();
+            }
+            else {
+                currentThread->semaphoreWaitBegin(NULL);
+                currentThread->semaphoreUnLock();
+
+                signaled = signaled || (dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER) != 0);
+                currentThread->semaphoreWaitDone(NULL);
+                //signaled = signaled || currentThread->isCurrentThreadInterrupted();
+            }
+
+            return !signaled;
 #endif
         }
 
@@ -269,8 +311,10 @@ namespace aRibeiro {
             //printf("[Semaphore] release...\n");
             BOOL result = ReleaseSemaphore( semaphore, 1, NULL );
             ARIBEIRO_ABORT(!result, "ReleaseSemaphore error: %s\n", _GetLastErrorToString_semaphore().c_str());
-    #elif defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
+    #elif defined(OS_TARGET_linux)
             sem_post(&semaphore);
+    #elif defined(OS_TARGET_mac)
+            dispatch_semaphore_signal(semaphore);
     #endif
         }
 

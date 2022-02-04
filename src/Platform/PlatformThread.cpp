@@ -256,7 +256,7 @@ namespace aRibeiro {
 
         _instance->mutex.lock();
 
-        printf("Trying to signal a thread with USR1. pthread_t 0x%lx\n", _instance->m_thread);
+        printf("Trying to signal a thread with USR1. pthread_t %p\n", _instance->m_thread);
         pthread_kill(*_instance->getNativeThread(), SIGUSR1);
         while (_instance->opened_semaphore > 0) {
 
@@ -265,7 +265,7 @@ namespace aRibeiro {
             aRibeiro::PlatformSleep::sleepMillis(500);
 
             _instance->mutex.lock();
-            printf("Trying to signal a thread with USR1. pthread_t 0x%lx\n", _instance->m_thread);
+            printf("Trying to signal a thread with USR1. pthread_t %p\n", _instance->m_thread);
             pthread_kill(*_instance->getNativeThread(), SIGUSR1);
         }
 
@@ -351,7 +351,7 @@ namespace aRibeiro {
                 }
                 */
 
-               printf("Creating interrupt thread. pthread_t 0x%lx\n", m_thread);
+               printf("Creating interrupt thread. pthread_t %p\n", m_thread);
 
                 if (interrupt_thread == NULL) {
                     interrupt_thread = new PlatformThread(self_interrupt_thread_kill_semaphores, this);
@@ -366,7 +366,6 @@ namespace aRibeiro {
                 // check is main thread
                 //if (m_thread == )
 
-                
                 struct sigaction sa;
                 sigemptyset(&sa.sa_mask);
                 sa.sa_handler = platform_thread_signal_handler_usr1;
