@@ -112,11 +112,11 @@ namespace aRibeiro {
         this->name = name;
 
 #if defined(OS_TARGET_win)
-        buffer_name = std::string(name) + std::string("_aribeiro_buffer_data");
-        semaphore_name = std::string(name) + std::string("_aribeiro_buffer_semaphore");
+        buffer_name = std::string(name) + std::string("_abd");//aribeiro_buffer_data
+        semaphore_name = std::string(name) + std::string("_abs");//aribeiro_buffer_semaphore
 #elif defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
-        buffer_name = std::string("/") + std::string(name) + std::string("_aribeiro_buffer_data");
-        semaphore_name = std::string("/") + std::string(name) + std::string("_aribeiro_buffer_semaphore");
+        buffer_name = std::string("/") + std::string(name) + std::string("_abd");//aribeiro_buffer_data
+        semaphore_name = std::string("/") + std::string(name) + std::string("_abs");//aribeiro_buffer_semaphore
 
         f_lock = -1;
 #endif

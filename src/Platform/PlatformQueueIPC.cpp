@@ -109,13 +109,13 @@ namespace aRibeiro {
         this->name = name;
 
 #if defined(OS_TARGET_win)
-        header_name = std::string(name) + std::string("_aribeiro_queue_header");
-        buffer_name = std::string(name) + std::string("_aribeiro_queue_buffer");
-        semaphore_name = std::string(name) + std::string("_aribeiro_queue_semaphore");
+        header_name = std::string(name) + std::string("_aqh");//aribeiro_queue_header
+        buffer_name = std::string(name) + std::string("_aqb");//aribeiro_queue_buffer
+        semaphore_name = std::string(name) + std::string("_aqs");//aribeiro_queue_semaphore
 #elif defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
-        header_name = std::string("/") + std::string(name) + std::string("_aribeiro_queue_header");
-        buffer_name = std::string("/") + std::string(name) + std::string("_aribeiro_queue_buffer");
-        semaphore_name = std::string("/") + std::string(name) + std::string("_aribeiro_queue_semaphore");
+        header_name = std::string("/") + std::string(name) + std::string("_aqh");//aribeiro_queue_header
+        buffer_name = std::string("/") + std::string(name) + std::string("_aqb");//aribeiro_queue_buffer
+        semaphore_name = std::string("/") + std::string(name) + std::string("_aqs");//aribeiro_queue_semaphore
 
         f_lock = -1;
 #endif
