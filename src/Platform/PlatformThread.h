@@ -4,6 +4,7 @@
 #include <aRibeiroCore/common.h>
 #include <aRibeiroPlatform/PlatformMutex.h>
 #include <map>
+#include <string>
 
 // Fix for unaligned stack with clang and GCC on Windows XP 32-bit
 #if defined(OS_TARGET_win) && (defined(__clang__) || defined(__GNUC__))
@@ -239,6 +240,8 @@ namespace aRibeiro {
 
 
     public:
+        
+        std::string name;
 
         /// \brief Check if the current thread is interrupted
         ///

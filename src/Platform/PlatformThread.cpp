@@ -215,7 +215,12 @@ namespace aRibeiro {
     PlatformThread* PlatformThread::getMainThread() {
         //printf("[PlatformThread] Get main thread");
             //return main thread
+        // force to instanciate the opened thread manager before the main thread
+        //   Fix finalization issues related to the main thread...
+        PlatformThread_OpenedThreadManager::Instance();
         static PlatformThread mainThread;
+        if (mainThread.name.size() == 0)
+            mainThread.name = "Main Thread";
         return &mainThread;
     }
 
@@ -355,6 +360,7 @@ namespace aRibeiro {
 
                 if (interrupt_thread == NULL) {
                     interrupt_thread = new PlatformThread(self_interrupt_thread_kill_semaphores, this);
+                    interrupt_thread->name = "Interrupt Thread";
                     interrupt_thread->setShouldDisposeThreadByItself(true);
                     interrupt_thread->skip_interrupt = true;
                     interrupt_thread->start();
