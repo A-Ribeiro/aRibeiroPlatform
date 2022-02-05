@@ -262,10 +262,10 @@ namespace aRibeiro {
 
             _instance->mutex.unlock();
             
-            aRibeiro::PlatformSleep::sleepMillis(500);
+            aRibeiro::PlatformSleep::sleepMillis(50);
 
             _instance->mutex.lock();
-            printf("Trying to signal a thread with USR1. pthread_t %p\n", _instance->m_thread);
+            //printf("Trying to signal a thread with USR1. pthread_t %p\n", _instance->m_thread);
             pthread_kill(*_instance->getNativeThread(), SIGUSR1);
         }
 
@@ -372,13 +372,14 @@ namespace aRibeiro {
                 sa.sa_flags = 0;
                 sigaction(SIGUSR1, &sa, 0);
 
+                printf("[MainThread] Trying to signal a thread with USR1...\n");
                 pthread_kill(m_thread, SIGUSR1);
                 while (opened_semaphore > 0) {
                     mutex.unlock();
 
-                    aRibeiro::PlatformSleep::sleepMillis(500);
+                    aRibeiro::PlatformSleep::sleepMillis(50);
 
-                    printf("[MainThread] Trying to signal a thread with USR1...\n");
+                    //printf("[MainThread] Trying to signal a thread with USR1...\n");
 
                     mutex.lock();
                     pthread_kill(m_thread, SIGUSR1);
@@ -422,7 +423,11 @@ namespace aRibeiro {
             mutex.unlock();
 #endif
 
-        
+#if !defined(OS_TARGET_win)
+        // avoid call interrupt in the static main thread instance...
+        m_isMain = false;
+#endif
+
         interrupt();
         wait();
         

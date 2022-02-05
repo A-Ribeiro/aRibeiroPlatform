@@ -63,7 +63,7 @@
 
     #if defined(OS_TARGET_mac)
         // for unamed semaphores on mac
-        #include <dispatch/dispatch.h>
+        #include <aRibeiroPlatform/AppleSpecialSemaphore.h>
     #endif
 
 #else
@@ -82,7 +82,7 @@ namespace aRibeiro {
     #elif defined(OS_TARGET_linux) 
         sem_t semaphore;
     #elif defined(OS_TARGET_mac)
-        dispatch_semaphore_t semaphore;
+        fake_sem_t semaphore;
     #endif
 
         //private copy constructores, to avoid copy...
@@ -103,7 +103,7 @@ namespace aRibeiro {
     #elif defined(OS_TARGET_linux)
             sem_init(&semaphore, 0, count);// 0 means is a semaphore bound to threads
     #elif defined(OS_TARGET_mac)
-            semaphore = dispatch_semaphore_create(count);
+            fake_sem_init(&semaphore, 0, count);
     #endif
         }
         virtual ~PlatformSemaphore(){
@@ -114,7 +114,7 @@ namespace aRibeiro {
     #elif defined(OS_TARGET_linux)
             sem_destroy(&semaphore);
     #elif defined(OS_TARGET_mac)
-            dispatch_release(semaphore);
+            fake_sem_destroy(&semaphore);
     #endif
         }
 
@@ -202,17 +202,36 @@ namespace aRibeiro {
     #elif defined(OS_TARGET_mac)
             if (timeout_ms == 0) {
                 currentThread->semaphoreUnLock();
-                //return sem_trywait(&semaphore) == 0;
-                return dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, 0)) == 0;
+                return fake_sem_trywait(&semaphore) == 0;
             }
+
+            struct timespec ts;
+            if (clock_gettime(CLOCK_REALTIME, &ts)) {
+                currentThread->semaphoreUnLock();
+                ARIBEIRO_ABORT(true, "clock_gettime error\n");
+            }
+
+            struct timespec ts_increment;
+            ts_increment.tv_sec = timeout_ms / 1000;
+            ts_increment.tv_nsec = ((long)timeout_ms % 1000L) * 1000000L;
+
+            ts.tv_nsec += ts_increment.tv_nsec;
+            ts.tv_sec += ts.tv_nsec / 1000000000L;
+            ts.tv_nsec = ts.tv_nsec % 1000000000L;
+
+            ts.tv_sec += ts_increment.tv_sec;
 
             currentThread->semaphoreWaitBegin(NULL);
             currentThread->semaphoreUnLock();
-
-            uint64_t timeout = NSEC_PER_MSEC * timeout_ms;
-            long s = dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, timeout));
-
+            int s = fake_sem_timedwait(&semaphore, &ts);
             currentThread->semaphoreWaitDone(NULL);
+
+            // currentThread->isCurrentThreadInterrupted() || 
+            if ( (s == -1 && errno != ETIMEDOUT) ) {
+                //interrupt signaled
+                //signaled = true;
+                return false;
+            }
 
             return s == 0;
     #endif
@@ -268,7 +287,6 @@ namespace aRibeiro {
             return !signaled;
 
 #elif defined(OS_TARGET_mac)
-
             aRibeiro::PlatformThread *currentThread = aRibeiro::PlatformThread::getCurrentThread();
 
             /*
@@ -296,8 +314,7 @@ namespace aRibeiro {
             else {
                 currentThread->semaphoreWaitBegin(NULL);
                 currentThread->semaphoreUnLock();
-
-                signaled = signaled || (dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER) != 0);
+                signaled = signaled || (fake_sem_wait(&semaphore) != 0);
                 currentThread->semaphoreWaitDone(NULL);
                 //signaled = signaled || currentThread->isCurrentThreadInterrupted();
             }
@@ -314,7 +331,7 @@ namespace aRibeiro {
     #elif defined(OS_TARGET_linux)
             sem_post(&semaphore);
     #elif defined(OS_TARGET_mac)
-            dispatch_semaphore_signal(semaphore);
+            fake_sem_post(&semaphore);
     #endif
         }
 
