@@ -31,7 +31,7 @@ namespace aRibeiro
         unsigned count;
     } fake_sem_t;
 
-    int fake_sem_init(fake_sem_t* psem, int flags, unsigned count) {
+    static int fake_sem_init(fake_sem_t* psem, int flags, unsigned count) {
         fake_sem_t pnewsem;
         int result;
         result = pthread_mutex_init(&pnewsem.mutex, NULL);
@@ -47,7 +47,7 @@ namespace aRibeiro
         return 0;
     }
 
-    int fake_sem_destroy(fake_sem_t *psem) {
+    static int fake_sem_destroy(fake_sem_t *psem) {
         if (!psem)
             return EINVAL;
         pthread_mutex_destroy(&psem->mutex);
@@ -55,7 +55,7 @@ namespace aRibeiro
         return 0;
     }
 
-    int fake_sem_post(fake_sem_t *pxsem) {
+    static int fake_sem_post(fake_sem_t *pxsem) {
         if (!pxsem)
             return EINVAL;
         int result, xresult;
@@ -74,7 +74,7 @@ namespace aRibeiro
         return 0;
     }
 
-    int fake_sem_wait(fake_sem_t *pxsem) {
+    static int fake_sem_wait(fake_sem_t *pxsem) {
         int result, xresult;
         if (!pxsem)
             return EINVAL;
@@ -101,7 +101,7 @@ namespace aRibeiro
         return 0;
     }
 
-    int fake_sem_trywait(fake_sem_t *pxsem) {
+    static int fake_sem_trywait(fake_sem_t *pxsem) {
         int result, xresult;
         if (!pxsem)
             return EINVAL;
@@ -123,7 +123,7 @@ namespace aRibeiro
         return 0;
     }
 
-    int fake_sem_timedwait(fake_sem_t *pxsem, const struct timespec *abstim) {
+    static int fake_sem_timedwait(fake_sem_t *pxsem, const struct timespec *abstim) {
         int result, xresult;
         if (!pxsem)
             return EINVAL;
