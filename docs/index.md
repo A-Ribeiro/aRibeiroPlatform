@@ -9,6 +9,10 @@ John 3:16
 
 https://github.com/A-Ribeiro/aRibeiroCore
 
+https://github.com/A-Ribeiro/aRibeiroPlatform
+
+https://github.com/A-Ribeiro/aRibeiroTests
+
 ## aRibeiroPlatform
 
 * Build
