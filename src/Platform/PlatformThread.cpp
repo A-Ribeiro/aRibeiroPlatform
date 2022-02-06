@@ -261,7 +261,7 @@ namespace aRibeiro {
 
         _instance->mutex.lock();
 
-        printf("Trying to signal a thread with USR1. pthread_t %p\n", _instance->m_thread);
+        printf("Trying to signal a thread with USR1. Name: %s\n", _instance->name.c_str());
         pthread_kill(*_instance->getNativeThread(), SIGUSR1);
         while (_instance->opened_semaphore > 0) {
 
@@ -356,7 +356,7 @@ namespace aRibeiro {
                 }
                 */
 
-               printf("Creating interrupt thread. pthread_t %p\n", m_thread);
+               printf("Creating interrupt thread. Name: %s\n", name.c_str());
 
                 if (interrupt_thread == NULL) {
                     interrupt_thread = new PlatformThread(self_interrupt_thread_kill_semaphores, this);
