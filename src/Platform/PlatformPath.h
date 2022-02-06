@@ -23,7 +23,7 @@ namespace aRibeiro {
         /// Example:
         ///
         /// \code
-        /// #include <aRibeiroPlatform/aribeiro.h>
+        /// #include <aRibeiroPlatform/aRibeiroPlatform.h>
         /// using namespace aRibeiro;
         ///
         /// int main(int argc, char *argv[]) {
@@ -45,7 +45,7 @@ namespace aRibeiro {
         /// Example:
         ///
         /// \code
-        /// #include <aRibeiroPlatform/aribeiro.h>
+        /// #include <aRibeiroPlatform/aRibeiroPlatform.h>
         /// using namespace aRibeiro;
         ///
         /// int main(int argc, char *argv[]) {
@@ -65,7 +65,7 @@ namespace aRibeiro {
         /// Example:
         ///
         /// \code
-        /// #include <aRibeiroPlatform/aribeiro.h>
+        /// #include <aRibeiroPlatform/aRibeiroPlatform.h>
         /// using namespace aRibeiro;
         ///
         /// std::string current_work_directory = PlatformPath::getWorkingPath();
@@ -85,7 +85,7 @@ namespace aRibeiro {
         /// Example:
         ///
         /// \code
-        /// #include <aRibeiroPlatform/aribeiro.h>
+        /// #include <aRibeiroPlatform/aRibeiroPlatform.h>
         /// using namespace aRibeiro;
         ///
         /// int main(int argc, char *argv[]) {
@@ -115,7 +115,7 @@ namespace aRibeiro {
         /// Example:
         ///
         /// \code
-        /// #include <aRibeiroPlatform/aribeiro.h>
+        /// #include <aRibeiroPlatform/aRibeiroPlatform.h>
         /// using namespace aRibeiro;
         ///
         /// std::string path_to_save_files = PlatformPath::getSaveGamePath( "Company Root Folder", "Game Name" );
@@ -150,7 +150,7 @@ namespace aRibeiro {
         /// Example:
         ///
         /// \code
-        /// #include <aRibeiroPlatform/aribeiro.h>
+        /// #include <aRibeiroPlatform/aRibeiroPlatform.h>
         /// using namespace aRibeiro;
         ///
         /// std::string path_to_save_files = PlatformPath::getDocumentsPath( "Company Root Folder", "App Name" );
@@ -175,7 +175,7 @@ namespace aRibeiro {
         /// Example:
         ///
         /// \code
-        /// #include <aRibeiroPlatform/aribeiro.h>
+        /// #include <aRibeiroPlatform/aRibeiroPlatform.h>
         /// using namespace aRibeiro;
         ///
         /// if ( PlatformPath::isDirectory( "directory to test" ) ) {
@@ -194,7 +194,7 @@ namespace aRibeiro {
         /// Example:
         ///
         /// \code
-        /// #include <aRibeiroPlatform/aribeiro.h>
+        /// #include <aRibeiroPlatform/aRibeiroPlatform.h>
         /// using namespace aRibeiro;
         ///
         /// if ( PlatformPath::isFile( "file to test" ) ) {
@@ -216,7 +216,7 @@ namespace aRibeiro {
         /// Example:
         ///
         /// \code
-        /// #include <aRibeiroPlatform/aribeiro.h>
+        /// #include <aRibeiroPlatform/aRibeiroPlatform.h>
         /// using namespace aRibeiro;
         ///
         /// int main(int argc, char *argv[]) {

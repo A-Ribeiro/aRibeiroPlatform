@@ -250,7 +250,7 @@ namespace aRibeiro {
         /// Example:
         ///
         /// \code
-        /// #include <aRibeiroPlatform/aribeiro.h>
+        /// #include <aRibeiroPlatform/aRibeiroPlatform.h>
         /// using namespace aRibeiro;
         ///
         /// void thread_example() {
@@ -285,7 +285,7 @@ namespace aRibeiro {
         /// Example:
         ///
         /// \code
-        /// #include <aRibeiroPlatform/aribeiro.h>
+        /// #include <aRibeiroPlatform/aRibeiroPlatform.h>
         /// using namespace aRibeiro;
         ///
         /// void thread_example() {
@@ -318,7 +318,7 @@ namespace aRibeiro {
         /// Example:
         ///
         /// \code
-        /// #include <aRibeiroPlatform/aribeiro.h>
+        /// #include <aRibeiroPlatform/aRibeiroPlatform.h>
         /// using namespace aRibeiro;
         ///
         /// void thread_example() {
@@ -349,7 +349,7 @@ namespace aRibeiro {
         /// Example:
         ///
         /// \code
-        /// #include <aRibeiroPlatform/aribeiro.h>
+        /// #include <aRibeiroPlatform/aRibeiroPlatform.h>
         /// using namespace aRibeiro;
         ///
         /// void thread_example() {
@@ -385,7 +385,7 @@ namespace aRibeiro {
         /// Example:
         ///
         /// \code
-        /// #include <aRibeiroPlatform/aribeiro.h>
+        /// #include <aRibeiroPlatform/aRibeiroPlatform.h>
         /// using namespace aRibeiro;
         ///
         /// void thread_example() {
@@ -410,7 +410,7 @@ namespace aRibeiro {
         /// example:
         ///
         /// \code
-        /// #include <aRibeiroPlatform/aribeiro.h>
+        /// #include <aRibeiroPlatform/aRibeiroPlatform.h>
         /// using namespace aRibeiro;
         ///
         /// void thread_function()
@@ -458,7 +458,7 @@ namespace aRibeiro {
         /// example:
         ///
         /// \code
-        /// #include <aRibeiroPlatform/aribeiro.h>
+        /// #include <aRibeiroPlatform/aRibeiroPlatform.h>
         /// using namespace aRibeiro;
         ///
         /// void threadFunc(int argument) {
@@ -505,7 +505,7 @@ namespace aRibeiro {
         /// example:
         ///
         /// \code
-        /// #include <aRibeiroPlatform/aribeiro.h>
+        /// #include <aRibeiroPlatform/aRibeiroPlatform.h>
         /// using namespace aRibeiro;
         ///
         /// class Task {
@@ -558,7 +558,7 @@ namespace aRibeiro {
         /// example:
         ///
         /// \code
-        /// #include <aRibeiroPlatform/aribeiro.h>
+        /// #include <aRibeiroPlatform/aRibeiroPlatform.h>
         /// using namespace aRibeiro;
         ///
         /// class Task {

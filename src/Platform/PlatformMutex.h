@@ -26,7 +26,7 @@ namespace aRibeiro {
     /// Example:
     ///
     /// \code
-    /// #include <aRibeiroPlatform/aribeiro.h>
+    /// #include <aRibeiroPlatform/aRibeiroPlatform.h>
     /// using namespace aRibeiro;
     ///
     /// PlatformMutex mutex;

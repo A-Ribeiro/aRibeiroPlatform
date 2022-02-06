@@ -13,7 +13,7 @@ namespace aRibeiro {
 
     Example of use
 
-#include <aRibeiroPlatform/aribeiro.h>
+#include <aRibeiroPlatform/aRibeiroPlatform.h>
 using namespace aRibeiro;
 
 ObjectQueue<int> queue;

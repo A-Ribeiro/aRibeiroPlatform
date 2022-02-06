@@ -1,7 +1,7 @@
 #ifndef __object_buffer__H__
 #define __object_buffer__H__
 
-//#include <aRibeiroPlatform/aribeiro.h>
+//#include <aRibeiroPlatform/aRibeiroPlatform.h>
 //#include "colorspace_ops.h"
 
 #include <aRibeiroCore/common.h>

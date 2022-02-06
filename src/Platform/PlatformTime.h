@@ -97,7 +97,7 @@ namespace aRibeiro {
         /// Example:
         ///
         /// \code
-        /// #include <aRibeiroPlatform/aribeiro.h>
+        /// #include <aRibeiroPlatform/aRibeiroPlatform.h>
         /// using namespace aRibeiro;
         ///
         /// PlatformTime time;
