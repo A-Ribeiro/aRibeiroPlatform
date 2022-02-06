@@ -157,40 +157,40 @@ macro(copy_alessandro_ribeiro_content_after_build PROJECT_NAME DIRECTORY)
 				 $<TARGET_FILE_DIR:${PROJECT_NAME}>/${DIRECTORY}/AlessandroRibeiro )
 endmacro()
 
-if (OS_TARGET STREQUAL win)
+# if (OS_TARGET STREQUAL win)
+#     macro(tool_unzip ZIPFILE OUTDIR)
+#         execute_process(
+#             COMMAND powershell.exe -file "${CMAKE_HOME_DIRECTORY}/cmake/powershell/unzip.ps1" -inputzipfile "${ZIPFILE}" -outputpath "${OUTDIR}"
+#             OUTPUT_VARIABLE result
+#         )
+#     endmacro()
+# else()
+#     macro(tool_unzip ZIPFILE OUTDIR)
+#         execute_process(
+#             COMMAND unzip -n "${ZIPFILE}" -d "${OUTDIR}"
+#             OUTPUT_VARIABLE result
+#             COMMAND_ERROR_IS_FATAL ANY
+#         )
+#     endmacro()
+# endif()
 
-    #macro(tool_check_or_create_dir DIRECTORY)
-    #    execute_process(
-    #        COMMAND powershell.exe -file "${CMAKE_HOME_DIRECTORY}/cmake/powershell/check_path_creation.ps1" -path "${CMAKE_HOME_DIRECTORY}/${DIRECTORY}"
-    #        OUTPUT_VARIABLE result
-    #    )
-    #endmacro()
+macro(tool_unzip ZIPFILE OUTDIR)
+    #execute_process(
+    #    COMMAND unzip -n "${ZIPFILE}" -d "${OUTDIR}"
+    #    OUTPUT_VARIABLE result
+    #    COMMAND_ERROR_IS_FATAL ANY
+    #)
+    execute_process(
+        COMMAND ${CMAKE_COMMAND} -E tar xzf "${ZIPFILE}"
+        WORKING_DIRECTORY "${OUTDIR}"
+        RESULT_VARIABLE ret
+    )
+    if(NOT ret EQUAL 0)
+        file(REMOVE "${ZIPFILE}")
+        message( FATAL_ERROR "Cannot unzip ${ZIPFILE}")
+    endif()
 
-    #macro(tool_download REPO_URL FILE OUTPUT_DIR)
-    #    execute_process(
-    #        COMMAND powershell.exe -file "${CMAKE_HOME_DIRECTORY}/cmake/powershell/download.ps1" -repository "${REPO_URL}" -uri "${FILE}" -outdir "${CMAKE_HOME_DIRECTORY}/${OUTPUT_DIR}"
-    #        OUTPUT_VARIABLE result
-    #    )
-    #endmacro()
-
-    macro(tool_unzip ZIPFILE OUTDIR)
-        execute_process(
-            COMMAND powershell.exe -file "${CMAKE_HOME_DIRECTORY}/cmake/powershell/unzip.ps1" -inputzipfile "${ZIPFILE}" -outputpath "${OUTDIR}"
-            OUTPUT_VARIABLE result
-        )
-    endmacro()
-
-else()
-
-    macro(tool_unzip ZIPFILE OUTDIR)
-        execute_process(
-            COMMAND unzip -n "${ZIPFILE}" -d "${OUTDIR}"
-            OUTPUT_VARIABLE result
-            COMMAND_ERROR_IS_FATAL ANY
-        )
-    endmacro()
-
-endif()
+endmacro()
 
 macro(tool_download_lib_package REPOSITORY_URL LIBNAME)
     if(NOT EXISTS "${CMAKE_HOME_DIRECTORY}/libs/${LIBNAME}.zip")
