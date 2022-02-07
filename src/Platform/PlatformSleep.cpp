@@ -8,16 +8,16 @@
 namespace aRibeiro {
 #if defined(OS_TARGET_win)
     class UseWindowsHighResolutionClock {
-    public:
         UseWindowsHighResolutionClock() {
             timeBeginPeriod(1);
         }
+    public:
         ~UseWindowsHighResolutionClock() {
             timeEndPeriod(1);
         }
-        static UseWindowsHighResolutionClock* Instance() {
+        static void sleep(int millis) {
             static UseWindowsHighResolutionClock useWindowsHighResolutionClock;
-            return &useWindowsHighResolutionClock;
+            Sleep(millis);
         }
     };
 #endif
@@ -28,8 +28,8 @@ namespace aRibeiro {
 
     void PlatformSleep::sleepMillis(int millis) {
 #if defined(OS_TARGET_win)
-        UseWindowsHighResolutionClock::Instance();
-        Sleep(millis);
+        UseWindowsHighResolutionClock::sleep(millis);
+        //Sleep(millis);
 #else
         usleep(millis * 1000);
 #endif
