@@ -336,7 +336,7 @@ namespace aRibeiro {
             
 
             if ( //m_isMain && 
-            pthread_self() == m_thread ) {
+                pthread_equal(pthread_self(),m_thread) ) {
 
                 //pthread_kill(m_thread, SIGUSR1);
 
