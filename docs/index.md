@@ -11,6 +11,10 @@ https://github.com/A-Ribeiro/aRibeiroCore
 
 https://github.com/A-Ribeiro/aRibeiroPlatform
 
+https://github.com/A-Ribeiro/aRibeiroData
+
+https://github.com/A-Ribeiro/aRibeiroWrappers
+
 https://github.com/A-Ribeiro/aRibeiroTests
 
 ## aRibeiroPlatform
