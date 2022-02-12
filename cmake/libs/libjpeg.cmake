@@ -35,7 +35,7 @@ elseif(LIB_JPEG STREQUAL UsingFindPackage)
         #message("Libs: ${JPEG_LIBRARIES}")
 
         add_library(libjpeg OBJECT ${JPEG_LIBRARIES})
-        #target_link_libraries(zlib INTERFACE ${ZLIB_LIBRARIES})
+        target_link_libraries(libjpeg ${JPEG_LIBRARIES})
         include_directories(${JPEG_INCLUDE_DIR} PARENT_SCOPE)
 
         # set the target's folder (for IDEs that support it, e.g. Visual Studio)

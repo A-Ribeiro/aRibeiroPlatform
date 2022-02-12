@@ -43,7 +43,7 @@ elseif(LIB_PNG STREQUAL UsingFindPackage)
         #message("Libs: ${PNG_LIBRARIES}")
 
         add_library(libpng OBJECT ${PNG_LIBRARIES})
-        #target_link_libraries(zlib INTERFACE ${ZLIB_LIBRARIES})
+        target_link_libraries(libpng ${PNG_LIBRARIES})
         include_directories(${PNG_INCLUDE_DIR} PARENT_SCOPE)
 
         # set the target's folder (for IDEs that support it, e.g. Visual Studio)

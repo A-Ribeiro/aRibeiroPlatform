@@ -33,7 +33,7 @@ elseif(LIB_ZLIB STREQUAL UsingFindPackage)
         find_package(ZLIB REQUIRED QUIET)
 
         add_library(zlib OBJECT ${ZLIB_LIBRARIES})
-        #target_link_libraries(zlib INTERFACE ${ZLIB_LIBRARIES})
+        target_link_libraries(zlib ${ZLIB_LIBRARIES})
         include_directories(${ZLIB_INCLUDE_DIR} PARENT_SCOPE)
 
         # set the target's folder (for IDEs that support it, e.g. Visual Studio)
