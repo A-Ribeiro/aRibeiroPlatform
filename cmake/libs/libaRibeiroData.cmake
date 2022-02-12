@@ -22,9 +22,9 @@ if (LIB_ARIBEIRODATA STREQUAL FromGit)
         message(FATAL_ERROR "Invalid Git Download Method: ${ARIBEIRO_GIT_DOWNLOAD_METHOD}" )
     endif()
 
-    set(supress_show_info ON)
+    set(supress_show_info ON CACHE INTERNAL "" FORCE)
     tool_include_lib(aRibeiroData)
-    unset(supress_show_info)
+    unset(supress_show_info CACHE)
 
 elseif (LIB_ARIBEIRODATA STREQUAL UsingFindPackage)
 
