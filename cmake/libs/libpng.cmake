@@ -33,6 +33,9 @@ if(LIB_PNG STREQUAL FromSource)
 
     add_library(libpng OBJECT $<TARGET_OBJECTS:png_static>)
 
+    # set the target's folder (for IDEs that support it, e.g. Visual Studio)
+    set_target_properties(libpng PROPERTIES FOLDER "LIBS")
+
 elseif(LIB_PNG STREQUAL UsingFindPackage)
 
     tool_is_lib(libpng libpng_registered)

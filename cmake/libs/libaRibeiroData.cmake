@@ -52,6 +52,9 @@ elseif (LIB_ARIBEIRODATA STREQUAL UsingFindPackage)
         target_link_libraries(aRibeiroData ${ARIBEIRODATA_LIBRARIES})
         include_directories(${ARIBEIRODATA_INCLUDE_DIR} PARENT_SCOPE)
 
+        # set the target's folder (for IDEs that support it, e.g. Visual Studio)
+        set_target_properties(aRibeiroData PROPERTIES FOLDER "aRibeiro")
+
         tool_register_lib(aRibeiroData)
     endif()
 
