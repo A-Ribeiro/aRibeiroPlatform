@@ -125,9 +125,6 @@ namespace aRibeiro {
             ARIBEIRO_ABORT(released, "ERROR: trying to release element from a deleted pool\n");
 
             //check in_use elements
-            ObjectPoolElement toSearch;
-            toSearch.data = data;
-
             typename std::map< T*, ObjectPoolElement >::iterator it = in_use.find(data);
 
             if (it != in_use.end()) {
@@ -146,6 +143,8 @@ namespace aRibeiro {
             }
 
             /*
+            ObjectPoolElement toSearch;
+            toSearch.data = data;
             ObjectPoolElement removedElement = in_use.removeInOrder(toSearch, true);
             if (removedElement.data != NULL) {
                 //placement delete operator
