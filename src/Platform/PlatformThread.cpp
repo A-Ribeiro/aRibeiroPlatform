@@ -60,6 +60,7 @@ namespace aRibeiro {
         PlatformMutex threadsToFinalizeLock;
         std::vector<ThreadFinalizeStruct> threadsToFinalize;
         PlatformThread releaseThread;
+        bool executing;
     
         void release(const ThreadFinalizeStruct &aux){
             
@@ -86,6 +87,8 @@ namespace aRibeiro {
         
         void releaseThreadID_thread(){
             PlatformTime time;
+
+            executing = true;
             
             time.update();
             while ( !PlatformThread::isCurrentThreadInterrupted() ) {
@@ -115,8 +118,14 @@ namespace aRibeiro {
     public:
         
         ReleaseThreadIDClass():releaseThread(this, &ReleaseThreadIDClass::releaseThreadID_thread){
+
+            executing = false;
             releaseThread.setShouldDisposeThreadByItself(true);
             releaseThread.start();
+            while (!executing) {
+                PlatformSleep::sleepMillis(50);
+            }
+
         }
         
         virtual ~ReleaseThreadIDClass(){
