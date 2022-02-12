@@ -14,6 +14,19 @@ endif()
 
 if (LIB_ARIBEIROPLATFORM STREQUAL FromGit)
 
+    unset(ARIBEIROPLATFORM_LIBRARIES CACHE)
+    unset(ARIBEIROPLATFORM_INCLUDE_DIR CACHE)
+
+    set( ARIBEIRO_GIT_DOWNLOAD_METHOD None CACHE STRING "The GitHUB download method." )
+    set_property(CACHE ARIBEIRO_GIT_DOWNLOAD_METHOD PROPERTY STRINGS None SSH HTTPS)
+
+    if (ARIBEIRO_GIT_DOWNLOAD_METHOD STREQUAL None)
+        message("\nYou need to set ARIBEIRO_GIT_DOWNLOAD_METHOD with:")
+        message("    SSH   -> To use the SSH gitHUB URL.")
+        message("    HTTPS -> To use the HTTPS gitHUB URL.")
+        message( FATAL_ERROR "" )
+    endif()
+
     if (ARIBEIRO_GIT_DOWNLOAD_METHOD STREQUAL HTTPS)
         tool_download_git_package("https://github.com/A-Ribeiro/aRibeiroPlatform.git" aRibeiroPlatform)
     elseif (ARIBEIRO_GIT_DOWNLOAD_METHOD STREQUAL SSH)
@@ -36,6 +49,7 @@ elseif (LIB_ARIBEIROPLATFORM STREQUAL UsingFindPackage)
 
         find_package(aRibeiroPlatform REQUIRED QUIET)
         add_library(aRibeiroPlatform OBJECT ${ARIBEIROPLATFORM_LIBRARIES})
+        target_link_libraries(aRibeiroPlatform ${ARIBEIROPLATFORM_LIBRARIES})
         include_directories(${ARIBEIROPLATFORM_INCLUDE_DIR} PARENT_SCOPE)
 
         tool_register_lib(aRibeiroPlatform)

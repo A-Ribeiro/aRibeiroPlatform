@@ -14,6 +14,19 @@ endif()
 
 if (LIB_ARIBEIROCORE STREQUAL FromGit)
 
+    unset(ARIBEIROCORE_LIBRARIES CACHE)
+    unset(ARIBEIROCORE_INCLUDE_DIR CACHE)
+
+    set( ARIBEIRO_GIT_DOWNLOAD_METHOD None CACHE STRING "The GitHUB download method." )
+    set_property(CACHE ARIBEIRO_GIT_DOWNLOAD_METHOD PROPERTY STRINGS None SSH HTTPS)
+
+    if (ARIBEIRO_GIT_DOWNLOAD_METHOD STREQUAL None)
+        message("\nYou need to set ARIBEIRO_GIT_DOWNLOAD_METHOD with:")
+        message("    SSH   -> To use the SSH gitHUB URL.")
+        message("    HTTPS -> To use the HTTPS gitHUB URL.")
+        message( FATAL_ERROR "" )
+    endif()
+
     if (ARIBEIRO_GIT_DOWNLOAD_METHOD STREQUAL HTTPS)
         tool_download_git_package("https://github.com/A-Ribeiro/aRibeiroCore.git" aRibeiroCore)
     elseif (ARIBEIRO_GIT_DOWNLOAD_METHOD STREQUAL SSH)
@@ -37,6 +50,7 @@ elseif (LIB_ARIBEIROCORE STREQUAL UsingFindPackage)
 
         find_package(aRibeiroCore REQUIRED QUIET)
         add_library(aRibeiroCore OBJECT ${ARIBEIROCORE_LIBRARIES})
+        target_link_libraries(aRibeiroCore ${ARIBEIROCORE_LIBRARIES})
         include_directories(${ARIBEIROCORE_INCLUDE_DIR} PARENT_SCOPE)
 
         tool_register_lib(aRibeiroCore)
