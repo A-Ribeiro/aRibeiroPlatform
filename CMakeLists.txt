@@ -22,7 +22,6 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake-modules)
 
 #the path we need to get the custom lib versions
 set(LIBS_REPOSITORY_URL "https://github.com/A-Ribeiro/public_libs/raw/main")
-set(GIT_DOWNLOAD_METHOD SSH) #HTTPS
 
 include(cmake/include.cmake)
 include(cmake/libs/libaRibeiroCore.cmake)

@@ -1,0 +1,56 @@
+set( LIB_PNG TryFindPackageFirst CACHE STRING "Choose the Library Source." )
+set_property(CACHE LIB_PNG PROPERTY STRINGS None TryFindPackageFirst UsingFindPackage FromSource)
+
+if(LIB_PNG STREQUAL TryFindPackageFirst)
+    find_package(PNG QUIET)
+    if (PNG_FOUND)
+        message(STATUS "[LIB_PNG] using system lib.")
+        set(LIB_PNG UsingFindPackage)
+    else()
+        message(STATUS "[LIB_PNG] compiling from source.")
+        set(LIB_PNG FromSource)
+    endif()
+endif()
+
+if(LIB_PNG STREQUAL FromSource)
+
+    if (NOT LIBS_REPOSITORY_URL)
+        message(FATAL_ERROR "You need to define the LIBS_REPOSITORY_URL to use the FromSource option for any lib.")
+    endif()
+
+    tool_download_lib_package(${LIBS_REPOSITORY_URL} libpng)
+
+    set(SKIP_INSTALL_ALL ON)
+    #set(PNG_STATIC ON)
+    option(PNG_SHARED "Build shared lib" OFF)
+    option(PNG_STATIC "Build static lib" ON)
+    option(PNG_TESTS  "Build libpng tests" OFF)
+    tool_include_lib(libpng)
+    #unset(SKIP_INSTALL_ALL)
+    #unset(PNG_STATIC)
+
+    include_directories(${CMAKE_HOME_DIRECTORY}/include/libpng/ PARENT_SCOPE)
+
+    add_library(libpng OBJECT $<TARGET_OBJECTS:png_static>)
+
+elseif(LIB_PNG STREQUAL UsingFindPackage)
+
+    tool_is_lib(libpng libpng_registered)
+    if (NOT ${libpng_registered})    
+        find_package(PNG REQUIRED QUIET)
+
+        #message("includeDIR: ${PNG_INCLUDE_DIR}")
+        #message("Libs: ${PNG_LIBRARIES}")
+
+        add_library(libpng OBJECT ${PNG_LIBRARIES})
+        #target_link_libraries(zlib INTERFACE ${ZLIB_LIBRARIES})
+        include_directories(${PNG_INCLUDE_DIR} PARENT_SCOPE)
+
+        # set the target's folder (for IDEs that support it, e.g. Visual Studio)
+        set_target_properties(libpng PROPERTIES FOLDER "LIBS")
+        tool_register_lib(libpng)
+    endif()
+
+else()
+    message( FATAL_ERROR "You need to specify the lib source." )
+endif()

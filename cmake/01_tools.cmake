@@ -215,27 +215,54 @@ endmacro()
 set( lib_list "" CACHE INTERNAL "lib_lists")
 mark_as_internal(lib_list)
 
-macro(tool_include_lib LIBNAME)
+macro(tool_is_lib LIBNAME result)
+    if ("${LIBNAME}" IN_LIST lib_list)
+        set(${result} ON)
+    else()
+        set(${result} OFF)
+    endif()
+endmacro()
+
+macro(tool_register_lib LIBNAME)
+    if (NOT "${LIBNAME}" IN_LIST lib_list)    
+        list(APPEND lib_list ${LIBNAME})
+        set( lib_list ${lib_list} CACHE INTERNAL "lib_lists" FORCE)
+    endif()
+endmacro()
+
+macro(tool_include_lib)
     #add_subdirectory("${CMAKE_HOME_DIRECTORY}/libs/${LIBNAME}" "${CMAKE_BINARY_DIR}/bin/${LIBNAME}")
     #add_subdirectory("${CMAKE_HOME_DIRECTORY}/libs/${LIBNAME}" "${CMAKE_CURRENT_BINARY_DIR}/${LIBNAME}")
 
     #get_property(aux GLOBAL PROPERTY BUILDSYSTEM_TARGETS)
     #get_directory_property(aux BUILDSYSTEM_TARGETS)
-    
-    if (NOT "${LIBNAME}" IN_LIST lib_list)
-        
-        list(APPEND lib_list ${LIBNAME})
-        set( lib_list ${lib_list} CACHE INTERNAL "lib_lists" FORCE)
 
-        #message("Add new Lib: ${lib_list}")
+    if (  ${ARGC} EQUAL 1 )
+        set(LIBNAME ${ARGV0})
+        if (NOT "${LIBNAME}" IN_LIST lib_list)
+            
+            list(APPEND lib_list ${LIBNAME})
+            set( lib_list ${lib_list} CACHE INTERNAL "lib_lists" FORCE)
 
-        add_subdirectory("${CMAKE_HOME_DIRECTORY}/libs/${LIBNAME}" "${CMAKE_BINARY_DIR}/${LIBNAME}")
+            #message("Add new Lib: ${lib_list}")
+            #message("Normal")
+            add_subdirectory("${CMAKE_HOME_DIRECTORY}/libs/${LIBNAME}" "${CMAKE_BINARY_DIR}/${LIBNAME}")
+        endif()
+    elseif (  ${ARGC} EQUAL 2 )
+        set(_PATH ${ARGV0})
+        set(LIBNAME ${ARGV1})
+        if (NOT "${LIBNAME}" IN_LIST lib_list)
+            
+            list(APPEND lib_list ${LIBNAME})
+            set( lib_list ${lib_list} CACHE INTERNAL "lib_lists" FORCE)
+
+            #message("Add new Lib: ${lib_list}")
+            #message("Path")
+            add_subdirectory("${CMAKE_HOME_DIRECTORY}/libs/${_PATH}/${LIBNAME}" "${CMAKE_BINARY_DIR}/${LIBNAME}")
+        endif()
+    else()
+        message(FATAL_ERROR "incorrect number of arguments.")
     endif()
-    
-    
-
-    
-    
 endmacro()
 
 

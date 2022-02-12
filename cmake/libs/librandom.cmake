@@ -1,16 +1,12 @@
-if (NOT LIB_RANDOM)
-    set( LIB_RANDOM FromPackage CACHE STRING "Choose the Library Source." FORCE )
-    set_property(CACHE LIB_RANDOM PROPERTY STRINGS None FromPackage FromSource)
-endif()
+set( LIB_RANDOM FromSource CACHE STRING "Choose the Library Source." )
+set_property(CACHE LIB_RANDOM PROPERTY STRINGS None FromSource)
 
 if (LIB_RANDOM STREQUAL FromSource)
-
-    message(FATAL_ERROR "Build from source not implemented yet." )
-
-elseif (LIB_RANDOM STREQUAL FromPackage)
+    
+    message(STATUS "[LIB_RANDOM] compiling from source.")
 
     if (NOT LIBS_REPOSITORY_URL)
-        message(FATAL_ERROR "You need to define the LIBS_REPOSITORY_URL to use the FromPackage option for any lib.")
+        message(FATAL_ERROR "You need to define the LIBS_REPOSITORY_URL to use the FromSource option for any lib.")
     endif()
 
     tool_download_lib_package(${LIBS_REPOSITORY_URL} librandom)
