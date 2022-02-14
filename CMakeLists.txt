@@ -75,7 +75,7 @@ if( NOT MSVC AND NOT ARIBEIRO_SKIP_INSTALL_PLATFORM )
     install(
         FILES 
             ${PUBLIC_HEADERS} 
-            "${CMAKE_HOME_DIRECTORY}/include/${PROJECT_NAME}/${PROJECT_NAME}.h"
+            "${ARIBEIRO_GEN_INCLUDE_DIR}/${PROJECT_NAME}/${PROJECT_NAME}.h"
             "LICENSE"
         DESTINATION include/${PROJECT_NAME}
     )
