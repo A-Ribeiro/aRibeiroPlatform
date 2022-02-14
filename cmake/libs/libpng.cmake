@@ -31,11 +31,13 @@ if(LIB_PNG STREQUAL FromSource)
 
     include_directories(${CMAKE_HOME_DIRECTORY}/include/libpng/ PARENT_SCOPE)
 
-    add_library(libpng OBJECT $<TARGET_OBJECTS:png_static>)
-    target_link_libraries(libpng PUBLIC png_static)
+    add_library(libpng ALIAS png_static)
+
+    #add_library(libpng OBJECT $<TARGET_OBJECTS:png_static>)
+    #target_link_libraries(libpng PUBLIC png_static)
 
     # set the target's folder (for IDEs that support it, e.g. Visual Studio)
-    set_target_properties(libpng PROPERTIES FOLDER "LIBS")
+    #set_target_properties(libpng PROPERTIES FOLDER "LIBS")
 
 elseif(LIB_PNG STREQUAL UsingFindPackage)
 
