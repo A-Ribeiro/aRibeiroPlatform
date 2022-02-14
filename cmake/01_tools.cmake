@@ -1,3 +1,16 @@
+
+set( ARIBEIRO_LIBS_DIR None CACHE STRING "The directory to download the libraries configured." )
+set( ARIBEIRO_GEN_INCLUDE_DIR None CACHE STRING "The directory to be created with a copy of the public headers of the library." )
+
+if (ARIBEIRO_LIBS_DIR STREQUAL None)
+    message(FATAL_ERROR "You need to set the ARIBEIRO_LIBS_DIR to any directory. Example: ${CMAKE_HOME_DIRECTORY}/libs")
+endif()
+
+if (ARIBEIRO_GEN_INCLUDE_DIR STREQUAL None)
+    message(FATAL_ERROR "You need to set the ARIBEIRO_GEN_INCLUDE_DIR to any directory. Example: ${CMAKE_HOME_DIRECTORY}/include")
+endif()
+
+
 macro ( mark_as_internal _var )
   set ( ${_var} ${${_var}} CACHE INTERNAL "hide this!" FORCE )
 endmacro( mark_as_internal _var )
@@ -47,7 +60,7 @@ macro(configure_build_flags projectname inputfile outputfile)
 
     configure_file(
         "${CMAKE_CURRENT_SOURCE_DIR}/${inputfile}"
-        "${CMAKE_HOME_DIRECTORY}/include/${projectname}/${outputfile}"
+        "${ARIBEIRO_GEN_INCLUDE_DIR}/${projectname}/${outputfile}"
         @ONLY
     )
 endmacro()
@@ -64,7 +77,7 @@ macro(configure_include_file projectname inputfile outputfile)
 
     configure_file(
         "${CMAKE_CURRENT_SOURCE_DIR}/${inputfile}"
-        "${CMAKE_HOME_DIRECTORY}/include/${projectname}/${outputfile}"
+        "${ARIBEIRO_GEN_INCLUDE_DIR}/${projectname}/${outputfile}"
         @ONLY
     )
 endmacro()
@@ -193,19 +206,19 @@ macro(tool_unzip ZIPFILE OUTDIR)
 endmacro()
 
 macro(tool_download_lib_package REPOSITORY_URL LIBNAME)
-    if(NOT EXISTS "${CMAKE_HOME_DIRECTORY}/libs/${LIBNAME}.zip")
-        file(MAKE_DIRECTORY "${CMAKE_HOME_DIRECTORY}/libs")
+    if(NOT EXISTS "${ARIBEIRO_LIBS_DIR}/${LIBNAME}.zip")
+        file(MAKE_DIRECTORY "${ARIBEIRO_LIBS_DIR}")
         message(STATUS "[${LIBNAME}] downloading...")
-        file(DOWNLOAD "${REPOSITORY_URL}/${LIBNAME}.zip" "${CMAKE_HOME_DIRECTORY}/libs/${LIBNAME}.zip" SHOW_PROGRESS STATUS result)
+        file(DOWNLOAD "${REPOSITORY_URL}/${LIBNAME}.zip" "${ARIBEIRO_LIBS_DIR}/${LIBNAME}.zip" SHOW_PROGRESS STATUS result)
         list (GET result 0 error_code)
         if(NOT error_code EQUAL 0)
-            file(REMOVE "${CMAKE_HOME_DIRECTORY}/libs/${LIBNAME}.zip")
+            file(REMOVE "${ARIBEIRO_LIBS_DIR}/${LIBNAME}.zip")
             message(FATAL_ERROR "Cannot download: ${REPOSITORY_URL}/${LIBNAME}.zip")
         endif()
         message(STATUS "[${LIBNAME}] unzip...")
         tool_unzip(
-            "${CMAKE_HOME_DIRECTORY}/libs/${LIBNAME}.zip"
-            "${CMAKE_HOME_DIRECTORY}/libs"
+            "${ARIBEIRO_LIBS_DIR}/${LIBNAME}.zip"
+            "${ARIBEIRO_LIBS_DIR}"
         )
         message(STATUS "[${LIBNAME}] done")
     endif()
@@ -231,8 +244,8 @@ macro(tool_register_lib LIBNAME)
 endmacro()
 
 macro(tool_include_lib)
-    #add_subdirectory("${CMAKE_HOME_DIRECTORY}/libs/${LIBNAME}" "${CMAKE_BINARY_DIR}/bin/${LIBNAME}")
-    #add_subdirectory("${CMAKE_HOME_DIRECTORY}/libs/${LIBNAME}" "${CMAKE_CURRENT_BINARY_DIR}/${LIBNAME}")
+    #add_subdirectory("${ARIBEIRO_LIBS_DIR}/${LIBNAME}" "${CMAKE_BINARY_DIR}/bin/${LIBNAME}")
+    #add_subdirectory("${ARIBEIRO_LIBS_DIR}/${LIBNAME}" "${CMAKE_CURRENT_BINARY_DIR}/${LIBNAME}")
 
     #get_property(aux GLOBAL PROPERTY BUILDSYSTEM_TARGETS)
     #get_directory_property(aux BUILDSYSTEM_TARGETS)
@@ -246,7 +259,7 @@ macro(tool_include_lib)
 
             #message("Add new Lib: ${lib_list}")
             #message("Normal")
-            add_subdirectory("${CMAKE_HOME_DIRECTORY}/libs/${LIBNAME}" "${CMAKE_BINARY_DIR}/${LIBNAME}")
+            add_subdirectory("${ARIBEIRO_LIBS_DIR}/${LIBNAME}" "${CMAKE_BINARY_DIR}/${LIBNAME}")
         endif()
     elseif (  ${ARGC} EQUAL 2 )
         set(_PATH ${ARGV0})
@@ -258,7 +271,7 @@ macro(tool_include_lib)
 
             #message("Add new Lib: ${lib_list}")
             #message("Path")
-            add_subdirectory("${CMAKE_HOME_DIRECTORY}/libs/${_PATH}/${LIBNAME}" "${CMAKE_BINARY_DIR}/${LIBNAME}")
+            add_subdirectory("${ARIBEIRO_LIBS_DIR}/${_PATH}/${LIBNAME}" "${CMAKE_BINARY_DIR}/${LIBNAME}")
         endif()
     else()
         message(FATAL_ERROR "incorrect number of arguments.")
@@ -267,19 +280,19 @@ endmacro()
 
 
 macro(tool_download_git_package REPOSITORY_URL LIBNAME)
-    if(NOT EXISTS "${CMAKE_HOME_DIRECTORY}/libs/${LIBNAME}/")
-        file(MAKE_DIRECTORY "${CMAKE_HOME_DIRECTORY}/libs")
+    if(NOT EXISTS "${ARIBEIRO_LIBS_DIR}/${LIBNAME}/")
+        file(MAKE_DIRECTORY "${ARIBEIRO_LIBS_DIR}")
         message(STATUS "[${LIBNAME}] cloning...")
 
         find_package(Git REQUIRED)
 
         execute_process(
-            COMMAND "${GIT_EXECUTABLE}" clone "${REPOSITORY_URL}" "${CMAKE_HOME_DIRECTORY}/libs/${LIBNAME}/"
+            COMMAND "${GIT_EXECUTABLE}" clone "${REPOSITORY_URL}" "${ARIBEIRO_LIBS_DIR}/${LIBNAME}/"
             OUTPUT_VARIABLE result
             #COMMAND_ERROR_IS_FATAL ANY
         )
 
-        if(NOT EXISTS "${CMAKE_HOME_DIRECTORY}/libs/${LIBNAME}/")
+        if(NOT EXISTS "${ARIBEIRO_LIBS_DIR}/${LIBNAME}/")
             message(FATAL_ERROR "Error to clone repository: ${REPOSITORY_URL}")
         endif()
 
