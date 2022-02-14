@@ -29,7 +29,7 @@ if(LIB_PNG STREQUAL FromSource)
     #unset(SKIP_INSTALL_ALL)
     #unset(PNG_STATIC)
 
-    include_directories(${CMAKE_HOME_DIRECTORY}/include/libpng/ PARENT_SCOPE)
+    include_directories("${ARIBEIRO_GEN_INCLUDE_DIR}/libpng/" PARENT_SCOPE)
 
     add_library(libpng ALIAS png_static)
 

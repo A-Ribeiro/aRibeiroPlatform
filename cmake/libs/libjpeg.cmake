@@ -22,7 +22,7 @@ if(LIB_JPEG STREQUAL FromSource)
 
     tool_include_lib(libjpeg)
 
-    include_directories(${CMAKE_HOME_DIRECTORY}/include/libjpeg/ PARENT_SCOPE)
+    include_directories("${ARIBEIRO_GEN_INCLUDE_DIR}/libjpeg/" PARENT_SCOPE)
 
 elseif(LIB_JPEG STREQUAL UsingFindPackage)
 

@@ -24,7 +24,7 @@ if(LIB_ZLIB STREQUAL FromSource)
     tool_include_lib(zlib)
     #unset(SKIP_INSTALL_ALL)
 
-    include_directories(${CMAKE_HOME_DIRECTORY}/include/zlib/ PARENT_SCOPE)
+    include_directories("${ARIBEIRO_GEN_INCLUDE_DIR}/zlib/" PARENT_SCOPE)
 
 elseif(LIB_ZLIB STREQUAL UsingFindPackage)
 

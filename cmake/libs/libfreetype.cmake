@@ -22,7 +22,7 @@ if(LIB_FREETYPE STREQUAL FromSource)
 
     tool_include_lib(freetype)
 
-    include_directories(${CMAKE_HOME_DIRECTORY}/include/freetype/ PARENT_SCOPE)
+    include_directories("${ARIBEIRO_GEN_INCLUDE_DIR}/freetype/" PARENT_SCOPE)
 
 elseif(LIB_FREETYPE STREQUAL UsingFindPackage)
 
