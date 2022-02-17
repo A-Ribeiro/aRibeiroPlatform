@@ -45,7 +45,7 @@ if (LIB_ARIBEIROCORE STREQUAL FromGit)
 
 elseif (LIB_ARIBEIROCORE STREQUAL UsingFindPackage)
 
-    tool_is_lib(aRibeiroCore aRibeiroPlatform_registered)
+    tool_is_lib(aRibeiroCore aRibeiroCore_registered)
     if (NOT ${aRibeiroCore_registered})
 
         find_package(aRibeiroCore REQUIRED QUIET)
