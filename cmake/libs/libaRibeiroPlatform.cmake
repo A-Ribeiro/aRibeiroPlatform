@@ -44,8 +44,7 @@ if (LIB_ARIBEIROPLATFORM STREQUAL FromGit)
 
 elseif (LIB_ARIBEIROPLATFORM STREQUAL UsingFindPackage)
 
-    tool_is_lib(aRibeiroPlatform aRibeiroPlatform_registered)
-    if (NOT ${aRibeiroPlatform_registered})
+    if (NOT TARGET aRibeiroPlatform)
 
         if(OS_TARGET STREQUAL linux)
             set(ADD_LIBS pthread rt)
@@ -59,7 +58,6 @@ elseif (LIB_ARIBEIROPLATFORM STREQUAL UsingFindPackage)
         # set the target's folder (for IDEs that support it, e.g. Visual Studio)
         set_target_properties(aRibeiroPlatform PROPERTIES FOLDER "aRibeiro")
 
-        tool_register_lib(aRibeiroPlatform)
     endif()
 
 else()

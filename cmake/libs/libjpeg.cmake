@@ -26,8 +26,7 @@ if(LIB_JPEG STREQUAL FromSource)
 
 elseif(LIB_JPEG STREQUAL UsingFindPackage)
 
-    tool_is_lib(libjpeg libjpeg_registered)
-    if (NOT ${libjpeg_registered})
+    if (NOT TARGET libjpeg)
 
         find_package(JPEG REQUIRED QUIET)
 
@@ -41,7 +40,6 @@ elseif(LIB_JPEG STREQUAL UsingFindPackage)
         # set the target's folder (for IDEs that support it, e.g. Visual Studio)
         set_target_properties(libjpeg PROPERTIES FOLDER "LIBS")
 
-        tool_register_lib(zlib)
     endif()
 
 else()

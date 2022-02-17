@@ -28,8 +28,8 @@ if(LIB_ZLIB STREQUAL FromSource)
 
 elseif(LIB_ZLIB STREQUAL UsingFindPackage)
 
-    tool_is_lib(zlib zlib_registered)
-    if (NOT ${zlib_registered})
+    if (NOT TARGET zlib)
+
         find_package(ZLIB REQUIRED QUIET)
 
         add_library(zlib OBJECT ${ZLIB_LIBRARIES})
@@ -39,7 +39,6 @@ elseif(LIB_ZLIB STREQUAL UsingFindPackage)
         # set the target's folder (for IDEs that support it, e.g. Visual Studio)
         set_target_properties(zlib PROPERTIES FOLDER "LIBS")
 
-        tool_register_lib(zlib)
     endif()
 
 else()

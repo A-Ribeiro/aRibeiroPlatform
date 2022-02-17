@@ -26,8 +26,8 @@ if(LIB_FREETYPE STREQUAL FromSource)
 
 elseif(LIB_FREETYPE STREQUAL UsingFindPackage)
 
-    tool_is_lib(freetype freetype_registered)
-    if (NOT ${freetype_registered})
+    if (NOT TARGET freetype)
+
         find_package(Freetype REQUIRED QUIET)
 
         add_library(freetype OBJECT ${FREETYPE_LIBRARIES})
@@ -37,7 +37,6 @@ elseif(LIB_FREETYPE STREQUAL UsingFindPackage)
         # set the target's folder (for IDEs that support it, e.g. Visual Studio)
         set_target_properties(freetype PROPERTIES FOLDER "LIBS")
 
-        tool_register_lib(freetype)
     endif()
 
 else()

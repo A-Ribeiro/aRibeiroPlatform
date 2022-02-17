@@ -41,8 +41,8 @@ if(LIB_PNG STREQUAL FromSource)
 
 elseif(LIB_PNG STREQUAL UsingFindPackage)
 
-    tool_is_lib(libpng libpng_registered)
-    if (NOT ${libpng_registered})    
+    if (NOT TARGET libpng)
+
         find_package(PNG REQUIRED QUIET)
 
         #message("includeDIR: ${PNG_INCLUDE_DIR}")
@@ -54,7 +54,7 @@ elseif(LIB_PNG STREQUAL UsingFindPackage)
 
         # set the target's folder (for IDEs that support it, e.g. Visual Studio)
         set_target_properties(libpng PROPERTIES FOLDER "LIBS")
-        tool_register_lib(libpng)
+
     endif()
 
 else()

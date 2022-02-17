@@ -64,8 +64,7 @@ if(LIB_ASSIMP STREQUAL FromSource)
 
 elseif(LIB_ASSIMP STREQUAL UsingFindPackage)
 
-    tool_is_lib(assimp assimp_registered)
-    if (NOT ${assimp_registered})
+    if (NOT TARGET assimp)
         
         #find_package(assimp REQUIRED QUIET)
 
@@ -90,8 +89,6 @@ elseif(LIB_ASSIMP STREQUAL UsingFindPackage)
 
         # set the target's folder (for IDEs that support it, e.g. Visual Studio)
         set_target_properties(assimp PROPERTIES FOLDER "LIBS")
-
-        tool_register_lib(assimp)
 
     endif()
 

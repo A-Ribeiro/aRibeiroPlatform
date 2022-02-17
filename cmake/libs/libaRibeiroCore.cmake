@@ -45,8 +45,7 @@ if (LIB_ARIBEIROCORE STREQUAL FromGit)
 
 elseif (LIB_ARIBEIROCORE STREQUAL UsingFindPackage)
 
-    tool_is_lib(aRibeiroCore aRibeiroCore_registered)
-    if (NOT ${aRibeiroCore_registered})
+    if (NOT TARGET aRibeiroCore)
 
         find_package(aRibeiroCore REQUIRED QUIET)
         add_library(aRibeiroCore OBJECT ${ARIBEIROCORE_LIBRARIES})
@@ -56,7 +55,6 @@ elseif (LIB_ARIBEIROCORE STREQUAL UsingFindPackage)
         # set the target's folder (for IDEs that support it, e.g. Visual Studio)
         set_target_properties(aRibeiroCore PROPERTIES FOLDER "aRibeiro")
 
-        tool_register_lib(aRibeiroCore)
     endif()
 else()
 

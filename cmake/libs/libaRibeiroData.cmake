@@ -44,8 +44,7 @@ if (LIB_ARIBEIRODATA STREQUAL FromGit)
 
 elseif (LIB_ARIBEIRODATA STREQUAL UsingFindPackage)
 
-    tool_is_lib(aRibeiroData aRibeiroData_registered)
-    if (NOT ${aRibeiroData_registered})
+    if (NOT TARGET aRibeiroData)
 
         find_package(aRibeiroData REQUIRED QUIET)
         add_library(aRibeiroData OBJECT ${ARIBEIRODATA_LIBRARIES})
@@ -55,7 +54,6 @@ elseif (LIB_ARIBEIRODATA STREQUAL UsingFindPackage)
         # set the target's folder (for IDEs that support it, e.g. Visual Studio)
         set_target_properties(aRibeiroData PROPERTIES FOLDER "aRibeiro")
 
-        tool_register_lib(aRibeiroData)
     endif()
 
 else()
