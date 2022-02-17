@@ -25,8 +25,6 @@ https://github.com/A-Ribeiro/font2bitmap
 
 ## aRibeiroPlatform
 
-* Build
-    * [How to Build](how-to-build.md)
 * aRibeiroPlatform
     * [Mac Address Reading](aRibeiroPlatform/feature-mac-address.md)
     * [Path](aRibeiroPlatform/feature-path.md)
