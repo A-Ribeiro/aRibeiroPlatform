@@ -2,14 +2,14 @@ set( LIB_SFML TryFindPackageFirst CACHE STRING "Choose the Library Source." )
 set_property(CACHE LIB_SFML PROPERTY STRINGS None TryFindPackageFirst UsingFindPackage FromSource)
 
 if(LIB_SFML STREQUAL TryFindPackageFirst)
-    find_package(SFML QUIET)
+    find_package(SFML 2 COMPONENTS system window graphics audio network QUIET)
 
-    if (SFML_INCLUDE_DIRS AND SFML_LIBRARIES)
-	  set(SFML_FOUND TRUE)
-    else()
-        unset(SFML_INCLUDE_DIRS CACHE)
-        unset(SFML_LIBRARIES CACHE)
-	endif()
+    # if (SFML_INCLUDE_DIR AND SFML_LIBRARIES)
+	#   set(SFML_FOUND TRUE)
+    # else()
+    #     unset(SFML_INCLUDE_DIR CACHE)
+    #     unset(SFML_LIBRARIES CACHE)
+	# endif()
 
     if (SFML_FOUND)
         message(STATUS "[LIB_SFML] using system lib.")
@@ -106,7 +106,10 @@ if(LIB_SFML STREQUAL FromSource)
 
 elseif(LIB_SFML STREQUAL UsingFindPackage)
 
-    message(FATAL_ERROR "SFML FIND PACKAGE NOT IMPLEMENTED")
+    #message(FATAL_ERROR "SFML FIND PACKAGE NOT IMPLEMENTED")
+
+    message(STATUS "SFML FIND PACKAGE - Uses Target to link with:")
+    message(STATUS "  sfml-window sfml-graphics sfml-audio sfml-network")
 
     # tool_is_lib(assimp assimp_registered)
     # if (NOT ${assimp_registered})
