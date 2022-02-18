@@ -58,7 +58,17 @@ if(LIB_ASSIMP STREQUAL FromSource)
     include_directories("${ARIBEIRO_LIBS_DIR}/${LIBNAME}/include/")
 
     # set the target's folder (for IDEs that support it, e.g. Visual Studio)
-    set_target_properties(assimp PROPERTIES FOLDER "LIBS/assimp")
+    if (TARGET assimp)
+        set_target_properties(assimp PROPERTIES FOLDER "LIBS/assimp")
+    endif()
+    if (TARGET zlibstatic)
+        set_target_properties(zlibstatic PROPERTIES FOLDER "LIBS/assimp")
+    endif()
+    if (TARGET UpdateAssimpLibsDebugSymbolsAndDLLs)
+        set_target_properties(UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTIES FOLDER "LIBS/assimp")
+    endif()
+    
+    
 
     #message(FATAL_ERROR "Compiling from Source not implemented")
 
