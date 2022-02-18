@@ -55,7 +55,7 @@ if(LIB_ASSIMP STREQUAL FromSource)
 
     tool_include_lib(assimp)
 
-    include_directories("${ARIBEIRO_LIBS_DIR}/${LIBNAME}/include/" PARENT_SCOPE)
+    include_directories("${ARIBEIRO_LIBS_DIR}/${LIBNAME}/include/")
 
     # set the target's folder (for IDEs that support it, e.g. Visual Studio)
     set_target_properties(assimp PROPERTIES FOLDER "LIBS/assimp")
@@ -85,7 +85,7 @@ elseif(LIB_ASSIMP STREQUAL UsingFindPackage)
 
         add_library(assimp OBJECT ${assimp_LIBRARIES})
         target_link_libraries(assimp ${assimp_LIBRARIES})
-        include_directories(${assimp_INCLUDE_DIRS} PARENT_SCOPE)
+        include_directories(${assimp_INCLUDE_DIRS})
 
         # set the target's folder (for IDEs that support it, e.g. Visual Studio)
         set_target_properties(assimp PROPERTIES FOLDER "LIBS")

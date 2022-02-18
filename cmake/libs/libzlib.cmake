@@ -24,7 +24,7 @@ if(LIB_ZLIB STREQUAL FromSource)
     tool_include_lib(zlib)
     #unset(SKIP_INSTALL_ALL)
 
-    include_directories("${ARIBEIRO_GEN_INCLUDE_DIR}/zlib/" PARENT_SCOPE)
+    include_directories("${ARIBEIRO_GEN_INCLUDE_DIR}/zlib/")
 
 elseif(LIB_ZLIB STREQUAL UsingFindPackage)
 
@@ -34,7 +34,7 @@ elseif(LIB_ZLIB STREQUAL UsingFindPackage)
 
         add_library(zlib OBJECT ${ZLIB_LIBRARIES})
         target_link_libraries(zlib ${ZLIB_LIBRARIES})
-        include_directories(${ZLIB_INCLUDE_DIR} PARENT_SCOPE)
+        include_directories(${ZLIB_INCLUDE_DIR})
 
         # set the target's folder (for IDEs that support it, e.g. Visual Studio)
         set_target_properties(zlib PROPERTIES FOLDER "LIBS")
