@@ -1,3 +1,7 @@
+if (TARGET libjpeg)
+    return()
+endif()
+
 set( LIB_JPEG TryFindPackageFirst CACHE STRING "Choose the Library Source." )
 set_property(CACHE LIB_JPEG PROPERTY STRINGS None TryFindPackageFirst UsingFindPackage FromSource)
 

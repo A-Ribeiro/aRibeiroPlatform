@@ -1,3 +1,7 @@
+if (TARGET aRibeiroPlatform)
+    return()
+endif()
+
 set( LIB_ARIBEIROPLATFORM TryFindPackageFirst CACHE STRING "Choose the Library Source." )
 set_property(CACHE LIB_ARIBEIROPLATFORM PROPERTY STRINGS None TryFindPackageFirst UsingFindPackage FromGit)
 

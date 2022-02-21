@@ -1,3 +1,7 @@
+if (TARGET LinkOpenGL)
+    return()
+endif()
+
 set( LIB_OPENGL UsingFindPackage CACHE STRING "Choose the Library Source." )
 set_property(CACHE LIB_OPENGL PROPERTY STRINGS None UsingFindPackage)
 

@@ -1,3 +1,7 @@
+if (TARGET md5)
+    return()
+endif()
+
 set( LIB_MD5 FromSource CACHE STRING "Choose the Library Source." )
 set_property(CACHE LIB_MD5 PROPERTY STRINGS None FromSource)
 

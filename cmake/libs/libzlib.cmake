@@ -1,3 +1,7 @@
+if (TARGET zlib)
+    return()
+endif()
+
 set( LIB_ZLIB TryFindPackageFirst CACHE STRING "Choose the Library Source." )
 set_property(CACHE LIB_ZLIB PROPERTY STRINGS None TryFindPackageFirst UsingFindPackage FromSource)
 

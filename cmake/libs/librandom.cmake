@@ -1,3 +1,7 @@
+if (TARGET librandom)
+    return()
+endif()
+
 set( LIB_RANDOM FromSource CACHE STRING "Choose the Library Source." )
 set_property(CACHE LIB_RANDOM PROPERTY STRINGS None FromSource)
 

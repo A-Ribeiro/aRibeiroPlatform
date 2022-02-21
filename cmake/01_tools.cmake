@@ -49,9 +49,23 @@ endmacro()
 
 macro(configure_build_flags projectname inputfile outputfile)
     set(cmake_build_flags "")
-    
+
+    set(target_compile_defs)
+    if (TARGET ${projectname})
+        get_target_property(target_compile_defs ${projectname} COMPILE_DEFINITIONS)
+    endif()
+
     # get build flags
     get_directory_property(aux COMPILE_DEFINITIONS)
+
+    # copy target defs that are not in dir defs
+    foreach(target_compile_opt ${target_compile_defs})
+        if (NOT "${target_compile_opt}" IN_LIST aux)
+            list(APPEND aux ${target_compile_opt})
+        endif()
+    endforeach()
+
+
     foreach(define ${aux})
         if(NOT "${define}" STREQUAL "NDEBUG")
             set(cmake_build_flags "${cmake_build_flags}#ifndef ${define}\n    #define ${define}\n#endif\n")
@@ -322,4 +336,13 @@ macro(tool_remove_compile_options)
 
     #set_property(DIRECTORY ${CMAKE_CURRENT_SRC_DIR} APPEND PROPERTY COMPILE_OPTIONS ${compile_opts})
     set_property(DIRECTORY ${CMAKE_CURRENT_SRC_DIR} PROPERTY COMPILE_OPTIONS ${compile_opts})
+endmacro()
+
+
+macro(tool_show_current_directories)
+    get_directory_property( dirs INCLUDE_DIRECTORIES )
+    message(STATUS "INCLUDE_DIRECTORIES for '${PROJECT_NAME}'")
+    foreach(dir ${dirs})
+        message(STATUS "    '${dir}'")
+    endforeach()
 endmacro()

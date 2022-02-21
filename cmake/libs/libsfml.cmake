@@ -1,3 +1,8 @@
+if (TARGET sfml-main OR TARGET sfml-system OR TARGET sfml-window OR TARGET sfml-graphics OR TARGET sfml-audio OR TARGET sfml-network)
+    return()
+endif()
+
+
 set( LIB_SFML TryFindPackageFirst CACHE STRING "Choose the Library Source." )
 set_property(CACHE LIB_SFML PROPERTY STRINGS None TryFindPackageFirst UsingFindPackage FromSource)
 

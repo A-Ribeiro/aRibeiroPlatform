@@ -1,3 +1,7 @@
+if (TARGET convertutf)
+    return()
+endif()
+
 set( LIB_CONVERTUTF FromSource CACHE STRING "Choose the Library Source." )
 set_property(CACHE LIB_CONVERTUTF PROPERTY STRINGS None FromSource)
 

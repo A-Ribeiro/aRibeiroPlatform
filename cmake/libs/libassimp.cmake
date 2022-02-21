@@ -1,3 +1,7 @@
+if (TARGET assimp)
+    return()
+endif()
+
 set( LIB_ASSIMP TryFindPackageFirst CACHE STRING "Choose the Library Source." )
 set_property(CACHE LIB_ASSIMP PROPERTY STRINGS None TryFindPackageFirst UsingFindPackage FromSource)
 

@@ -1,3 +1,7 @@
+if (TARGET freetype)
+    return()
+endif()
+
 set( LIB_FREETYPE TryFindPackageFirst CACHE STRING "Choose the Library Source." )
 set_property(CACHE LIB_FREETYPE PROPERTY STRINGS None TryFindPackageFirst UsingFindPackage FromSource)
 
