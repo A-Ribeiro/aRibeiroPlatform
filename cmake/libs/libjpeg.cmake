@@ -40,6 +40,7 @@ elseif(LIB_JPEG STREQUAL UsingFindPackage)
         add_library(libjpeg OBJECT ${JPEG_LIBRARIES})
         target_link_libraries(libjpeg ${JPEG_LIBRARIES})
         include_directories(${JPEG_INCLUDE_DIR})
+        set_target_properties(libjpeg PROPERTIES LINKER_LANGUAGE CXX)
 
         # set the target's folder (for IDEs that support it, e.g. Visual Studio)
         set_target_properties(libjpeg PROPERTIES FOLDER "LIBS")

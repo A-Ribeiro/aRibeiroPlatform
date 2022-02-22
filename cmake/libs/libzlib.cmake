@@ -39,6 +39,7 @@ elseif(LIB_ZLIB STREQUAL UsingFindPackage)
         add_library(zlib OBJECT ${ZLIB_LIBRARIES})
         target_link_libraries(zlib ${ZLIB_LIBRARIES})
         include_directories(${ZLIB_INCLUDE_DIR})
+        set_target_properties(zlib PROPERTIES LINKER_LANGUAGE CXX)
 
         # set the target's folder (for IDEs that support it, e.g. Visual Studio)
         set_target_properties(zlib PROPERTIES FOLDER "LIBS")

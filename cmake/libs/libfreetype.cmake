@@ -37,6 +37,7 @@ elseif(LIB_FREETYPE STREQUAL UsingFindPackage)
         add_library(freetype OBJECT ${FREETYPE_LIBRARIES})
         target_link_libraries(freetype ${FREETYPE_LIBRARIES})
         include_directories(${FREETYPE_INCLUDE_DIRS})
+        set_target_properties(freetype PROPERTIES LINKER_LANGUAGE CXX)
 
         # set the target's folder (for IDEs that support it, e.g. Visual Studio)
         set_target_properties(freetype PROPERTIES FOLDER "LIBS")

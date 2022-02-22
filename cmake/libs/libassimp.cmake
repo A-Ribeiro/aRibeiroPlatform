@@ -100,6 +100,7 @@ elseif(LIB_ASSIMP STREQUAL UsingFindPackage)
         add_library(assimp OBJECT ${assimp_LIBRARIES})
         target_link_libraries(assimp ${assimp_LIBRARIES})
         include_directories(${assimp_INCLUDE_DIRS})
+        set_target_properties(assimp PROPERTIES LINKER_LANGUAGE CXX)
 
         # set the target's folder (for IDEs that support it, e.g. Visual Studio)
         set_target_properties(assimp PROPERTIES FOLDER "LIBS")

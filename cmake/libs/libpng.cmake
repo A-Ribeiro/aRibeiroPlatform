@@ -55,6 +55,7 @@ elseif(LIB_PNG STREQUAL UsingFindPackage)
         add_library(libpng OBJECT ${PNG_LIBRARIES})
         target_link_libraries(libpng ${PNG_LIBRARIES})
         include_directories(${PNG_INCLUDE_DIR})
+        set_target_properties(libpng PROPERTIES LINKER_LANGUAGE CXX)
 
         # set the target's folder (for IDEs that support it, e.g. Visual Studio)
         set_target_properties(libpng PROPERTIES FOLDER "LIBS")
