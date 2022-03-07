@@ -655,11 +655,18 @@ public:
             int numCPU;
             std::size_t len = sizeof(numCPU); 
 
-            /* set the mib for hw.ncpu */
+            // alternative:
+            //sysctlbyname("hw.physicalcpu", &numCPU, &len, 0, 0);
+            sysctlbyname("hw.logicalcpu", &numCPU, &len, 0, 0);
+
+            return numCPU;
+            /*
+
+            // set the mib for hw.ncpu
             mib[0] = CTL_HW;
             mib[1] = HW_AVAILCPU;  // alternatively, try HW_NCPU;
 
-            /* get the number of CPUs from the system */
+            // get the number of CPUs from the system 
             sysctl(mib, 2, &numCPU, &len, NULL, 0);
 
             if (numCPU < 1) 
@@ -670,6 +677,7 @@ public:
                     numCPU = 1;
             }
             return numCPU;
+            */
         #else
             #error "QueryNumberOfSystemCores not implemented in the current system"
         #endif
