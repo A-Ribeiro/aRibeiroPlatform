@@ -637,6 +637,41 @@ private:
 public:
         friend class PlatformThread_OpenedThreadManager;
 
+        static int QueryNumberOfSystemThreads() {
+        // https://stackoverflow.com/questions/150355/programmatically-find-the-number-of-cores-on-a-machine
+        #if defined(OS_TARGET_win)
+            SYSTEM_INFO sysinfo;
+            GetSystemInfo(&sysinfo);
+            int numCPU = sysinfo.dwNumberOfProcessors;
+            return numCPU;
+        #elif defined(OS_TARGET_linux)
+            int numCPU = sysconf(_SC_NPROCESSORS_ONLN);
+            return numCPU;
+        #elif defined(OS_TARGET_mac)
+            int mib[4];
+            int numCPU;
+            std::size_t len = sizeof(numCPU); 
+
+            /* set the mib for hw.ncpu */
+            mib[0] = CTL_HW;
+            mib[1] = HW_AVAILCPU;  // alternatively, try HW_NCPU;
+
+            /* get the number of CPUs from the system */
+            sysctl(mib, 2, &numCPU, &len, NULL, 0);
+
+            if (numCPU < 1) 
+            {
+                mib[1] = HW_NCPU;
+                sysctl(mib, 2, &numCPU, &len, NULL, 0);
+                if (numCPU < 1)
+                    numCPU = 1;
+            }
+            return numCPU;
+        #else
+            #error "QueryNumberOfSystemCores not implemented in the current system"
+        #endif
+        }
+
     };
 
 }
