@@ -66,6 +66,8 @@
     #include <algorithm>
     #include <semaphore.h>
 
+    #include <unistd.h> // sysconf
+
     #include <sys/syscall.h>
     #include <sys/types.h>
     typedef pid_t THREAD_ID_TYPE;
