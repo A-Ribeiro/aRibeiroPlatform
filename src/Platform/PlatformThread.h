@@ -77,6 +77,7 @@
     #include <algorithm>
     #include <semaphore.h>
     #include <sys/types.h>
+    #include <sys/sysctl.h>
     typedef uint64_t THREAD_ID_TYPE;
 
     typedef pthread_t THREAD_HANDLE_TYPE;
@@ -672,6 +673,11 @@ public:
         #else
             #error "QueryNumberOfSystemCores not implemented in the current system"
         #endif
+        /*
+            iOS or newer Macs
+            NSUInteger a = [[NSProcessInfo processInfo] processorCount];
+            NSUInteger b = [[NSProcessInfo processInfo] activeProcessorCount];
+        */
         }
 
     };
