@@ -553,7 +553,7 @@ namespace aRibeiro {
         if (queue_header_ptr->size == 0) {
             unlock();
 
-            printf("ERROR: Trying to read element from an empty queue.\n");
+            //printf("ERROR: Trying to read element from an empty queue.\n");
             return false;
         }
 
