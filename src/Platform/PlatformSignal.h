@@ -28,13 +28,16 @@ class PlatformSignal {
                 PlatformSignal::fnc(0);
             Sleep(5000);
             return TRUE;
-
-            // Pass other signals to the next handler.
+        
         case CTRL_BREAK_EVENT:
             //Beep(900, 200);
             //printf("Ctrl-Break event\n\n");
-            return FALSE;
+            if (PlatformSignal::fnc != NULL)
+                PlatformSignal::fnc(0);
+            Sleep(5000);
+            return TRUE;
 
+            // Pass other signals to the next handler.
         case CTRL_LOGOFF_EVENT:
             //Beep(1000, 200);
             //printf("Ctrl-Logoff event\n\n");
