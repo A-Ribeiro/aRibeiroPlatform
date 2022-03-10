@@ -56,7 +56,7 @@ namespace aRibeiro {
             sprintf(aux, "p%u", dwProcessId);
             pid_str = aux;
 
-            queue = new PlatformLowLatencyQueueIPC(pid_str.c_str(), PlatformQueueIPC_WRITE, 16, sizeof(int));
+            queue = new PlatformLowLatencyQueueIPC(pid_str.c_str(), PlatformQueueIPC_READ, 16, sizeof(int));
             thread.setShouldDisposeThreadByItself(true);
             thread.start();
         }
@@ -114,10 +114,23 @@ namespace aRibeiro {
             findAndReplaceAll(&lpApplicationName, "/", PlatformPath::SEPARATOR);
             lpApplicationName += ".exe";
 
+            /*
+            TCHAR buffer[MAX_PATH];
+            TCHAR** lppPart = { NULL };
+            DWORD retval = GetFullPathName(
+                lpApplicationName.c_str(),
+                MAX_PATH,
+                buffer,
+                lppPart
+            );
+            if (retval)
+                lpApplicationName = buffer;
+            */
+
             if (commandLine.length() > 0)
-                commandLine = lpApplicationName + " " + commandLine;
+                commandLine = "\"" + lpApplicationName + "\"" + " " + commandLine;
             else
-                commandLine = lpApplicationName;
+                commandLine = "\"" + lpApplicationName + "\"";
 
             // set the size of the structures
             ZeroMemory(&startupInfo, sizeof(startupInfo));
