@@ -37,6 +37,9 @@ namespace aRibeiro {
 		}
 
 		ObjectBuffer() {
+			
+			//printf("ObjectBuffer()\n");
+
 			data = NULL;
 			size = 0;
 			alloc_size = 0;
@@ -45,6 +48,7 @@ namespace aRibeiro {
 		}
 
 		virtual ~ObjectBuffer() {
+			//printf("virtual ~ObjectBuffer()\n");
 			free();
 		}
 
