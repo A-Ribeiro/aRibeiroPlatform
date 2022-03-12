@@ -276,7 +276,7 @@ namespace aRibeiro {
 
             _instance->mutex.unlock();
             
-            aRibeiro::PlatformSleep::sleepMillis(50);
+            aRibeiro::PlatformSleep::sleepMillis(200);
 
             _instance->mutex.lock();
             //printf("Trying to signal a thread with USR1. pthread_t %p\n", _instance->m_thread);

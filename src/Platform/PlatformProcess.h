@@ -2,6 +2,7 @@
 #define Platform_Process_h__
 
 #include <aRibeiroCore/common.h>
+#include <aRibeiroCore/StringUtil.h>
 #include <aRibeiroPlatform/PlatformLowLatencyQueueIPC.h>
 #include <aRibeiroPlatform/PlatformMutex.h>
 #include <aRibeiroPlatform/PlatformAutoLock.h>
@@ -10,6 +11,13 @@
 #include <string>
 #include <algorithm>
 #include <signal.h>
+
+#if defined(OS_TARGET_linux)
+
+#include <sys/wait.h>
+
+#endif
+
 
 namespace aRibeiro {
 
@@ -86,6 +94,10 @@ namespace aRibeiro {
 #if defined(_WIN32)
         STARTUPINFO startupInfo;
         PROCESS_INFORMATION processInformation;
+#elif defined(OS_TARGET_linux)
+
+        pid_t created_pid;
+
 #endif
 
         static void findAndReplaceAll(std::string* data, const std::string& toSearch, const std::string& replaceStr) {
@@ -156,6 +168,29 @@ namespace aRibeiro {
                 pid_str = aux;
             }
 
+#elif defined(OS_TARGET_linux)
+
+    created_pid = fork ();
+    if (created_pid==0) { 
+        // child process
+        //execve replaces the current process memory with the new shell executable
+
+        std::vector<std::string> args_str = StringUtil::tokenizer(commandLine, " ");
+        
+        char ** argv = new char* [args_str.size()+1];
+        memset(argv, 0, (args_str.size()+1) *sizeof(char*));
+        for(int i=0;i<args_str.size();i++){
+            argv[i] = &args_str[i][0];
+        }
+        //char * const*envp={NULL};
+        char *const envp[]={NULL};
+        execve(lpApplicationName.c_str(), argv, envp);
+        //perror (cmd);
+        exit(127);
+    }
+
+    process_created = created_pid > 0;
+
 #endif
 
         }
@@ -175,6 +210,10 @@ namespace aRibeiro {
                 TerminateProcess(processInformation.hProcess, exit_code);
                 CloseHandle(processInformation.hProcess);
                 CloseHandle(processInformation.hThread);
+#elif defined(OS_TARGET_linux)
+
+                kill(created_pid, SIGKILL);
+
 #endif
             }
         }
@@ -207,6 +246,37 @@ namespace aRibeiro {
                 pid_str = "";
                 process_created = false;
 
+#elif defined(OS_TARGET_linux)
+
+                //SIGTERM or a SIGKILL
+                kill(created_pid, sig);
+
+                int status;
+                bool timeout = false;
+
+                PlatformTime timer;
+                int64_t timer_acc = 0;
+                timer.update();
+                while (waitpid(created_pid, &status, WNOHANG) != created_pid){
+                    timer.update();
+                    timer_acc += timer.deltaTimeMicro;
+                    if (timer_acc > force_horrible_terminate_after_ms * 1000 ){
+                        printf("[PlatformProcess] FORCE KILL CHILDREN TIMEOUT\n");
+                        kill(created_pid, SIGKILL);
+                        timeout = true;
+                        break;
+                    }
+                    PlatformSleep::sleepMillis(50);
+                }
+
+                if (timeout){
+                    exit_code = 0;
+                } else if (WIFEXITED(status)) {
+                    exit_code = WEXITSTATUS(status);
+                } else
+                    exit_code = -1;//exit with error (signal, for example)
+
+                process_created = false;
 #endif
             }
 
