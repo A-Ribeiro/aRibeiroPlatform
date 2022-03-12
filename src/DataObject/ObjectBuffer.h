@@ -5,6 +5,8 @@
 //#include "colorspace_ops.h"
 
 #include <aRibeiroCore/common.h>
+#include <aRibeiroPlatform/PlatformMutex.h>
+#include <aRibeiroPlatform/PlatformAutoLock.h>
 
 namespace aRibeiro {
 
@@ -19,6 +21,7 @@ namespace aRibeiro {
         void operator=(const ObjectBuffer& v){}
 
 		bool constructed_from_external_buffer;
+		PlatformMutex mutex;
 	public:
 		uint8_t *data;
 		size_t alloc_size;
@@ -46,6 +49,8 @@ namespace aRibeiro {
 		}
 
 		ObjectBuffer* setSize(size_t _size, int _align = 32) {
+			PlatformAutoLock autoLock(&mutex);
+			
 			if (_size == size)
 				return this;
 			
@@ -63,6 +68,7 @@ namespace aRibeiro {
 		}
 
         ObjectBuffer* copy(const ObjectBuffer* src) {
+			PlatformAutoLock autoLock(&mutex);
             setSize(src->size, src->align);
             memcpy(data, src->data,size);
 
@@ -70,6 +76,9 @@ namespace aRibeiro {
         }
 
 		ObjectBuffer* free() {
+
+			//printf("ObjectBuffer* free()\n");
+			PlatformAutoLock autoLock(&mutex);
 			if (!constructed_from_external_buffer && data != NULL) {
 				free_aligned(data);
 			}
@@ -79,6 +88,7 @@ namespace aRibeiro {
 			alloc_size = 0;
 			constructed_from_external_buffer = false;
 
+			//printf("ObjectBuffer* free()  Done\n");
 			return this;
 		}
 

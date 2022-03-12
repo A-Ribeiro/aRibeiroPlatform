@@ -62,18 +62,29 @@ namespace aRibeiro {
         }
 
         virtual ~ObjectPool() {
+            
+            //printf("virtual ~ObjectPool()\n");
+
             PlatformAutoLock autoLock(&mutex);
 
+            //printf("while (available.size() > 0)\n");
             while (available.size() > 0) {
+                //printf("    while (available.size() > 0)\n");
                 ObjectPoolElement element = available.dequeue(true);
+
+                if (!element.ignore_placement_new_delete)
+                    new (element.data) T();
                 delete element.data;
             }
 
+            //printf("while (it != in_use.end())\n");
             typename std::map< T*, ObjectPoolElement >::iterator it = in_use.begin();
             while (it != in_use.end()) {
+                //printf("    typename std::map< T*, ObjectPoolElement >::iterator it = in_use.begin()\n");
                 ObjectPoolElement element = it->second;
-                if (!element.ignore_placement_new_delete)
-                    element.data->~T();
+                //if (!element.ignore_placement_new_delete)
+                    //new (element.data) T();
+                    //element.data->~T();
                 delete element.data;
             }
             in_use.clear();
