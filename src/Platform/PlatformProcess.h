@@ -177,15 +177,18 @@ namespace aRibeiro {
 
         std::vector<std::string> args_str = StringUtil::tokenizer(commandLine, " ");
         
-        char ** argv = new char* [args_str.size()+1];
-        memset(argv, 0, (args_str.size()+1) *sizeof(char*));
+        char ** argv = new char* [args_str.size()+2];
+        memset(argv, 0, (args_str.size()+2) *sizeof(char*));
         for(int i=0;i<args_str.size();i++){
-            argv[i] = &args_str[i][0];
+            argv[i+1] = &args_str[i][0];
         }
-        //char * const*envp={NULL};
-        char *const envp[]={NULL};
+        argv[0] = &lpApplicationName[0];
+        char *const envp[]={NULL,NULL};
+
+        //printf("Will execute: %s\n",lpApplicationName.c_str());
+
         execve(lpApplicationName.c_str(), argv, envp);
-        //perror (cmd);
+        perror ((std::string("Error to execute: ") + lpApplicationName).c_str());
         exit(127);
     }
 
