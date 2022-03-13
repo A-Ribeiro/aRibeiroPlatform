@@ -12,7 +12,7 @@
 #include <algorithm>
 #include <signal.h>
 
-#if defined(OS_TARGET_linux)
+#if defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
 
 #include <sys/wait.h>
 
@@ -94,7 +94,7 @@ namespace aRibeiro {
 #if defined(_WIN32)
         STARTUPINFO startupInfo;
         PROCESS_INFORMATION processInformation;
-#elif defined(OS_TARGET_linux)
+#elif defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
 
         pid_t created_pid;
 
@@ -168,7 +168,7 @@ namespace aRibeiro {
                 pid_str = aux;
             }
 
-#elif defined(OS_TARGET_linux)
+#elif defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
 
     created_pid = fork ();
     if (created_pid==0) { 
@@ -213,7 +213,7 @@ namespace aRibeiro {
                 TerminateProcess(processInformation.hProcess, exit_code);
                 CloseHandle(processInformation.hProcess);
                 CloseHandle(processInformation.hThread);
-#elif defined(OS_TARGET_linux)
+#elif defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
 
                 kill(created_pid, SIGKILL);
 
@@ -249,7 +249,7 @@ namespace aRibeiro {
                 pid_str = "";
                 process_created = false;
 
-#elif defined(OS_TARGET_linux)
+#elif defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
 
                 //SIGTERM or a SIGKILL
                 kill(created_pid, sig);
