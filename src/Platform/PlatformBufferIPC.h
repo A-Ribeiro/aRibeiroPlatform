@@ -29,8 +29,8 @@
 
 namespace aRibeiro {
 
-    const uint32_t PlatformBufferIPC_READ = 1 << 0;
-    const uint32_t PlatformBufferIPC_WRITE = 1 << 1;
+    //const uint32_t PlatformBufferIPC_READ = 1 << 0;
+    //const uint32_t PlatformBufferIPC_WRITE = 1 << 1;
 
     class PlatformBufferIPC {
 
@@ -69,7 +69,7 @@ namespace aRibeiro {
         uint32_t size;
 
         PlatformBufferIPC(const char* name = "default",
-            uint32_t mode = PlatformBufferIPC_READ | PlatformBufferIPC_WRITE,
+            //uint32_t mode = PlatformBufferIPC_READ | PlatformBufferIPC_WRITE,
             uint32_t buffer_size_ = 1024 );
         
         bool isFirstProcess();

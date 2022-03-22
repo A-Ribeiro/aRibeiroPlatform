@@ -100,7 +100,7 @@ namespace aRibeiro {
 
     PlatformBufferIPC::PlatformBufferIPC(
         const char* name,
-        uint32_t mode,
+        //uint32_t mode,
         uint32_t buffer_size_
     ) {
 
@@ -164,13 +164,13 @@ namespace aRibeiro {
             ARIBEIRO_ABORT(true, "Error to create the buffer IPC queue.\n");
         }
         
-        if (mode == ( PlatformBufferIPC_READ | PlatformBufferIPC_WRITE) ) {
+        //if (mode == ( PlatformBufferIPC_READ | PlatformBufferIPC_WRITE) ) {
             real_data_ptr = (uint8_t*)MapViewOfFile(buffer_handle, FILE_MAP_ALL_ACCESS, 0, 0, size + sizeof(uint32_t));
             if (real_data_ptr == 0) {
                 unlock(true);
                 ARIBEIRO_ABORT(true, "Error to map the IPC buffer.\n");
             }
-        } else if (mode == PlatformBufferIPC_READ) {
+        /*} else if (mode == PlatformBufferIPC_READ) {
             real_data_ptr = (uint8_t*)MapViewOfFile(buffer_handle, FILE_MAP_READ, 0, 0, size + sizeof(uint32_t));
             if (real_data_ptr == 0) {
                 unlock(true);
@@ -185,7 +185,7 @@ namespace aRibeiro {
         } else {
             unlock(true);
             ARIBEIRO_ABORT(true, "Buffer opening mode not specified.\n");
-        }
+        }*/
 
 #elif defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
 
@@ -223,7 +223,7 @@ namespace aRibeiro {
 
         lock();//lock the created semaphore
 
-        if (mode == (PlatformBufferIPC_READ | PlatformBufferIPC_WRITE)) {
+        //if (mode == (PlatformBufferIPC_READ | PlatformBufferIPC_WRITE)) {
             real_data_ptr = (uint8_t*)mmap(
                 NULL,
                 size + sizeof(uint32_t),
@@ -233,11 +233,11 @@ namespace aRibeiro {
                 0
             );
             if (real_data_ptr == MAP_FAILED) {
-                lock();
+                unlock();
                 unlock(true);
                 ARIBEIRO_ABORT(true, "Error to map the IPC buffer. Error code: %s\n", strerror(errno) );
             }
-        }
+        /*}
         else if (mode == PlatformBufferIPC_READ) {
             real_data_ptr = (uint8_t*)mmap(
                 NULL,
@@ -272,16 +272,16 @@ namespace aRibeiro {
             unlock();
             unlock(true);
             ARIBEIRO_ABORT(true, "Buffer opening mode not specified.\n");
-        }
+        }*/
 
 #endif
 
-        uint32_t *count = (uint32_t *)&real_data_ptr[0];
+        uint32_t *count = (uint32_t *)&real_data_ptr[size];
         (*count) ++;
 
         isFirst = (*count) == 1;
 
-        data = &real_data_ptr[ sizeof(uint32_t) ];
+        data = &real_data_ptr[ 0 ];
 
         printf("Initialization OK.\n");
         
@@ -308,7 +308,7 @@ namespace aRibeiro {
             bool is_last_buffer = false;
 
             if (buffer_handle != BUFFER_HANDLE_NULL) {
-                uint32_t *count = (uint32_t *)&real_data_ptr[0];
+                uint32_t *count = (uint32_t *)&real_data_ptr[size];
                 is_last_buffer = ((*count)-1) == 0;
             }
         #endif
@@ -317,7 +317,7 @@ namespace aRibeiro {
 
         if (buffer_handle != BUFFER_HANDLE_NULL) {
 
-            uint32_t *count = (uint32_t *)&real_data_ptr[0];
+            uint32_t *count = (uint32_t *)&real_data_ptr[size];
             (*count)--;
 
 #if defined(OS_TARGET_win)
