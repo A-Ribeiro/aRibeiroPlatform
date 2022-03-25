@@ -24,11 +24,11 @@ namespace aRibeiro {
 		PlatformMutex mutex;
 	public:
 		uint8_t *data;
-		size_t alloc_size;
-		size_t size;
+		uint32_t alloc_size;
+		uint32_t size;
         int align;
 
-		ObjectBuffer(uint8_t *data, size_t _size, int _align = 32) {
+		ObjectBuffer(uint8_t *data, uint32_t _size, int _align = 32) {
 			data = data;
 			size = _size;
             align = _align;
@@ -52,7 +52,7 @@ namespace aRibeiro {
 			free();
 		}
 
-		ObjectBuffer* setSize(size_t _size, int _align = 32) {
+		ObjectBuffer* setSize(uint32_t _size, int _align = 32) {
 			PlatformAutoLock autoLock(&mutex);
 			
 			if (_size == size)

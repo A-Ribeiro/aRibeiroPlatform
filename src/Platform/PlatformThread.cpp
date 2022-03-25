@@ -95,7 +95,7 @@ namespace aRibeiro {
                 time.update();
                 int32_t delta_ms = time.deltaTimeMicro/1000;
                 threadsToFinalizeLock.lock();
-                for(int i=threadsToFinalize.size()-1;i>=0;i--){
+                for(int i=(int)threadsToFinalize.size()-1;i>=0;i--){
                     threadsToFinalize[i].timeout_ms -= delta_ms;
                     if (threadsToFinalize[i].timeout_ms < 0){
                         ThreadFinalizeStruct aux = threadsToFinalize[i];
@@ -108,7 +108,7 @@ namespace aRibeiro {
             }
             
             threadsToFinalizeLock.lock();
-            for(int i=threadsToFinalize.size()-1;i>=0;i--){
+            for(int i=(int)threadsToFinalize.size()-1;i>=0;i--){
                 release(threadsToFinalize[i]);
             }
             threadsToFinalize.clear();

@@ -54,7 +54,7 @@ namespace aRibeiro {
             if (char_buffer.size() == 0)
                 return "";
 
-            queue.write((uint8_t*)&char_buffer[0], char_buffer.size(), false);
+            queue.write((uint8_t*)&char_buffer[0], (uint32_t)char_buffer.size(), false);
 
             return &char_buffer[0];
         }

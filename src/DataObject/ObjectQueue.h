@@ -400,9 +400,9 @@ int main(int argc, char* argv[]){
                 semaphore.release();
         }
 
-        int size() {
+        uint32_t size() {
             PlatformAutoLock autoLock(&mutex);
-            return list.size();
+            return (uint32_t)list.size();
         }
 
         T peek() {
