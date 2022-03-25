@@ -26,7 +26,7 @@ namespace aRibeiro {
 		uint8_t *data;
 		size_t alloc_size;
 		size_t size;
-        size_t align;
+        int align;
 
 		ObjectBuffer(uint8_t *data, size_t _size, int _align = 32) {
 			data = data;
