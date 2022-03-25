@@ -131,11 +131,11 @@ namespace aRibeiro {
             DynamicSort(ThreadPool* _threadPool);
             ~DynamicSort();
 
-            void sort_int32_t(int32_t* A, uint32_t size, DynamicSortGather gather = DynamicSortGather::DynamicSortGather_counting, DynamicSortAlgorithm algorithm = DynamicSortAlgorithm::DynamicSortAlgorithm_radix_counting);
-            void sort_uint32_t(uint32_t* A, uint32_t size, DynamicSortGather gather = DynamicSortGather::DynamicSortGather_counting, DynamicSortAlgorithm algorithm = DynamicSortAlgorithm::DynamicSortAlgorithm_radix_counting);
+            void sort_int32_t(int32_t* A, uint32_t size, DynamicSortGather gather = DynamicSortGather_counting, DynamicSortAlgorithm algorithm = DynamicSortAlgorithm_radix_counting);
+            void sort_uint32_t(uint32_t* A, uint32_t size, DynamicSortGather gather = DynamicSortGather_counting, DynamicSortAlgorithm algorithm = DynamicSortAlgorithm_radix_counting);
 
-            void sort_IndexInt32(IndexInt32* A, uint32_t size, DynamicSortGather gather = DynamicSortGather::DynamicSortGather_counting, DynamicSortAlgorithm algorithm = DynamicSortAlgorithm::DynamicSortAlgorithm_radix_counting);
-            void sort_IndexUInt32(IndexUInt32* A, uint32_t size, DynamicSortGather gather = DynamicSortGather::DynamicSortGather_counting, DynamicSortAlgorithm algorithm = DynamicSortAlgorithm::DynamicSortAlgorithm_radix_counting);
+            void sort_IndexInt32(IndexInt32* A, uint32_t size, DynamicSortGather gather = DynamicSortGather_counting, DynamicSortAlgorithm algorithm = DynamicSortAlgorithm_radix_counting);
+            void sort_IndexUInt32(IndexUInt32* A, uint32_t size, DynamicSortGather gather = DynamicSortGather_counting, DynamicSortAlgorithm algorithm = DynamicSortAlgorithm_radix_counting);
 
 
         };

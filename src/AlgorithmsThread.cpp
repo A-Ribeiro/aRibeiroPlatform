@@ -440,6 +440,8 @@ namespace aRibeiro {
                     case DynamicSortAlgorithm_std:
                         std::sort(job.sort_copy.sort._array_int32, job.sort_copy.sort._array_int32 + job.sort_copy.sort._size);
                         break;
+                    default:
+                        break;
                     }
                     memcpy(job.sort_copy.copy._Dst, job.sort_copy.copy._Src, job.sort_copy.copy._Size);
                     break;
@@ -451,10 +453,14 @@ namespace aRibeiro {
                     case DynamicSortAlgorithm_std:
                         std::sort(job.sort_copy.sort._array_int32, job.sort_copy.sort._array_int32 + job.sort_copy.sort._size);
                         break;
+                    default:
+                        break;
                     }
                     break;
                 case DynamicSortJob_Merge:
                     merge_job_int32(job.merge.in_int32, job.merge.out_int32, job.merge.i, job.merge.element_count, job.merge.size);
+                    break;
+                default:
                     break;
                 }
                 break;
@@ -471,6 +477,8 @@ namespace aRibeiro {
                     case DynamicSortAlgorithm_std:
                         std::sort(job.sort_copy.sort._array_uint32, job.sort_copy.sort._array_uint32 + job.sort_copy.sort._size);
                         break;
+                    default:
+                        break;
                     }
                     memcpy(job.sort_copy.copy._Dst, job.sort_copy.copy._Src, job.sort_copy.copy._Size);
                     break;
@@ -482,10 +490,14 @@ namespace aRibeiro {
                     case DynamicSortAlgorithm_std:
                         std::sort(job.sort_copy.sort._array_uint32, job.sort_copy.sort._array_uint32 + job.sort_copy.sort._size);
                         break;
+                    default:
+                        break;
                     }
                     break;
                 case DynamicSortJob_Merge:
                     merge_job_uint32(job.merge.in_uint32, job.merge.out_uint32, job.merge.i, job.merge.element_count, job.merge.size);
+                    break;
+                default:
                     break;
                 }
                 break;
@@ -503,6 +515,8 @@ namespace aRibeiro {
                         //std::sort(job.sort_copy.sort._array_IndexInt32, job.sort_copy.sort._array_IndexInt32 + job.sort_copy.sort._size);
                         ARIBEIRO_ABORT(true, "comparator not implemented\n");
                         break;
+                    default:
+                        break;
                     }
                     memcpy(job.sort_copy.copy._Dst, job.sort_copy.copy._Src, job.sort_copy.copy._Size);
                     break;
@@ -515,10 +529,14 @@ namespace aRibeiro {
                         //std::sort(job.sort_copy.sort._array_IndexInt32, job.sort_copy.sort._array_IndexInt32 + job.sort_copy.sort._size);
                         ARIBEIRO_ABORT(true, "comparator not implemented\n");
                         break;
+                    default:
+                        break;
                     }
                     break;
                 case DynamicSortJob_Merge:
                     merge_job_int32(job.merge.in_int32, job.merge.out_int32, job.merge.i, job.merge.element_count, job.merge.size);
+                    break;
+                default:
                     break;
                 }
                 break;
@@ -536,6 +554,8 @@ namespace aRibeiro {
                         //std::sort(job.sort_copy.sort._array_IndexUInt32, job.sort_copy.sort._array_IndexUInt32 + job.sort_copy.sort._size);
                         ARIBEIRO_ABORT(true, "comparator not implemented\n");
                         break;
+                    default:
+                        break;
                     }
                     memcpy(job.sort_copy.copy._Dst, job.sort_copy.copy._Src, job.sort_copy.copy._Size);
                     break;
@@ -548,12 +568,18 @@ namespace aRibeiro {
                         //std::sort(job.sort_copy.sort._array_IndexUInt32, job.sort_copy.sort._array_IndexUInt32 + job.sort_copy.sort._size);
                         ARIBEIRO_ABORT(true, "comparator not implemented\n");
                         break;
+                    default:
+                        break;
                     }
                     break;
                 case DynamicSortJob_Merge:
                     merge_job_uint32(job.merge.in_uint32, job.merge.out_uint32, job.merge.i, job.merge.element_count, job.merge.size);
                     break;
+                default:
+                        break;
                 }
+                break;
+            default:
                 break;
             }
 
@@ -1327,6 +1353,8 @@ namespace aRibeiro {
             case DynamicSortGather_merge:
                 merge_int32_t(A, size, algorithm);
                 break;
+            default:
+                break;
             }
         }
 
@@ -1343,6 +1371,8 @@ namespace aRibeiro {
                 break;
             case DynamicSortGather_merge:
                 merge_uint32_t(A, size, algorithm);
+                break;
+            default:
                 break;
             }
         }
@@ -1362,6 +1392,8 @@ namespace aRibeiro {
             case DynamicSortGather_merge:
                 merge_IndexInt32(A, size, algorithm);
                 break;
+            default:
+                break;
             }
         }
 
@@ -1378,6 +1410,8 @@ namespace aRibeiro {
                 break;
             case DynamicSortGather_merge:
                 merge_IndexUInt32(A, size, algorithm);
+                break;
+            default:
                 break;
             }
 
