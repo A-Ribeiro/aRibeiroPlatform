@@ -283,7 +283,7 @@ namespace aRibeiro {
 
         data = &real_data_ptr[ 0 ];
 
-        printf("Initialization OK.\n");
+        //printf("Initialization OK.\n");
         
         //unlock();
     }
