@@ -1,6 +1,7 @@
 #include "PlatformThread.h"
 #include "PlatformSleep.h"
 #include "PlatformTime.h"
+#include <aRibeiroPlatform/GlobalThreadOptions.h>
 
 #include <stdio.h>
 
@@ -222,6 +223,8 @@ namespace aRibeiro {
     }
 
     PlatformThread* PlatformThread::getMainThread() {
+        // force set the global thread priority
+        getGlobalThreadPriority();
         //printf("[PlatformThread] Get main thread");
             //return main thread
         // force to instanciate the opened thread manager before the main thread
@@ -555,6 +558,18 @@ namespace aRibeiro {
         // when set RoundRobin or FIFO, the priority can be 1 .. 99
         struct sched_param param = { 0 };
         param.sched_priority = 1;
+
+        GlobalThreadPriority priority = getGlobalThreadPriority();
+        if (priority == GlobalThreadPriority_Normal) {
+            param.sched_priority = 33;
+        }
+        else if (priority == GlobalThreadPriority_High) {
+            param.sched_priority = 66;
+        }
+        else if (priority == GlobalThreadPriority_Realtime) {
+            param.sched_priority = 99;
+        }
+
         error = pthread_attr_setschedparam(&attrs, &param) != 0;
         ARIBEIRO_ABORT(error, "Error set Thread Priority\n");
         
@@ -655,6 +670,21 @@ namespace aRibeiro {
 
     unsigned int __stdcall PlatformThread::entryPoint(void* userData)
     {
+        GlobalThreadPriority priority = getGlobalThreadPriority();
+
+        if (priority == GlobalThreadPriority_Normal){
+            if (!SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL))
+                printf("SetThreadPriority ChildThread ERROR...\n");
+        }
+        else if (priority == GlobalThreadPriority_High){
+            if (!SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST))
+                printf("SetThreadPriority ChildThread ERROR...\n");
+        }
+        else if (priority == GlobalThreadPriority_Realtime){
+            if (!SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL))
+                printf("SetThreadPriority ChildThread ERROR...\n");
+        }
+
         // The Thread instance is stored in the user data
         PlatformThread* owner = static_cast<PlatformThread*>(userData);
         PlatformThread_OpenedThreadManager::Instance()->registerThread(owner);
