@@ -1328,8 +1328,9 @@ namespace aRibeiro {
         }
 
 
-        DynamicSort::DynamicSort(ThreadPool* _threadPool) :semaphore(0) {
+        DynamicSort::DynamicSort(ThreadPool* _threadPool, uint32_t _useMultithreadStartingAtCount) :semaphore(0) {
             threadPool = _threadPool;
+            useMultithreadStartingAtCount = _useMultithreadStartingAtCount;
             /*
 
             for (int i = 0; i < PlatformThread::QueryNumberOfSystemThreads(); i++)
@@ -1359,18 +1360,34 @@ namespace aRibeiro {
             PlatformAutoLock _autoLock(&mutex);
 
             auxBuffer.setSize(size * sizeof(int32_t));
-            switch (gather) {
-            case DynamicSortGather_bucket:
-                bucket_int32_t(A, size, algorithm);
-                break;
-            case DynamicSortGather_counting:
-                counting_int32_t(A, size, algorithm);
-                break;
-            case DynamicSortGather_merge:
-                merge_int32_t(A, size, algorithm);
-                break;
-            default:
-                break;
+            if (size < useMultithreadStartingAtCount) {
+
+                switch (algorithm) {
+                case DynamicSortAlgorithm_radix_counting:
+                    radix_counting_sort_signed(A, size, (int32_t*)auxBuffer.data);
+                    break;
+                case DynamicSortAlgorithm_std:
+                    std::sort(A, A + size);
+                    break;
+                default:
+                    break;
+                }
+
+            }
+            else {
+                switch (gather) {
+                case DynamicSortGather_bucket:
+                    bucket_int32_t(A, size, algorithm);
+                    break;
+                case DynamicSortGather_counting:
+                    counting_int32_t(A, size, algorithm);
+                    break;
+                case DynamicSortGather_merge:
+                    merge_int32_t(A, size, algorithm);
+                    break;
+                default:
+                    break;
+                }
             }
         }
 
@@ -1378,18 +1395,34 @@ namespace aRibeiro {
             PlatformAutoLock _autoLock(&mutex);
 
             auxBuffer.setSize(size * sizeof(uint32_t));
-            switch (gather) {
-            case DynamicSortGather_bucket:
-                bucket_uint32_t(A, size, algorithm);
-                break;
-            case DynamicSortGather_counting:
-                counting_uint32_t(A, size, algorithm);
-                break;
-            case DynamicSortGather_merge:
-                merge_uint32_t(A, size, algorithm);
-                break;
-            default:
-                break;
+            if (size < useMultithreadStartingAtCount) {
+
+                switch (algorithm) {
+                case DynamicSortAlgorithm_radix_counting:
+                    radix_counting_sort_unsigned(A, size, (uint32_t*)auxBuffer.data);
+                    break;
+                case DynamicSortAlgorithm_std:
+                    std::sort(A, A + size);
+                    break;
+                default:
+                    break;
+                }
+
+            }
+            else {
+                switch (gather) {
+                case DynamicSortGather_bucket:
+                    bucket_uint32_t(A, size, algorithm);
+                    break;
+                case DynamicSortGather_counting:
+                    counting_uint32_t(A, size, algorithm);
+                    break;
+                case DynamicSortGather_merge:
+                    merge_uint32_t(A, size, algorithm);
+                    break;
+                default:
+                    break;
+                }
             }
         }
 
@@ -1398,18 +1431,34 @@ namespace aRibeiro {
             PlatformAutoLock _autoLock(&mutex);
 
             auxBuffer.setSize(size * sizeof(IndexInt32));
-            switch (gather) {
-            case DynamicSortGather_bucket:
-                bucket_IndexInt32(A, size, algorithm);
-                break;
-            case DynamicSortGather_counting:
-                counting_IndexInt32(A, size, algorithm);
-                break;
-            case DynamicSortGather_merge:
-                merge_IndexInt32(A, size, algorithm);
-                break;
-            default:
-                break;
+            if (size < useMultithreadStartingAtCount) {
+
+                switch (algorithm) {
+                case DynamicSortAlgorithm_radix_counting:
+                    radix_counting_sort_signed_index(A, size, (IndexInt32*)auxBuffer.data);
+                    break;
+                case DynamicSortAlgorithm_std:
+                    std::sort(A, A + size, IndexInt32::comparator);
+                    break;
+                default:
+                    break;
+                }
+
+            }
+            else {
+                switch (gather) {
+                case DynamicSortGather_bucket:
+                    bucket_IndexInt32(A, size, algorithm);
+                    break;
+                case DynamicSortGather_counting:
+                    counting_IndexInt32(A, size, algorithm);
+                    break;
+                case DynamicSortGather_merge:
+                    merge_IndexInt32(A, size, algorithm);
+                    break;
+                default:
+                    break;
+                }
             }
         }
 
@@ -1417,20 +1466,35 @@ namespace aRibeiro {
             PlatformAutoLock _autoLock(&mutex);
 
             auxBuffer.setSize(size * sizeof(IndexUInt32));
-            switch (gather) {
-            case DynamicSortGather_bucket:
-                bucket_IndexUInt32(A, size, algorithm);
-                break;
-            case DynamicSortGather_counting:
-                counting_IndexUInt32(A, size, algorithm);
-                break;
-            case DynamicSortGather_merge:
-                merge_IndexUInt32(A, size, algorithm);
-                break;
-            default:
-                break;
-            }
+            if (size < useMultithreadStartingAtCount) {
 
+                switch (algorithm) {
+                case DynamicSortAlgorithm_radix_counting:
+                    radix_counting_sort_unsigned_index(A, size, (IndexUInt32*)auxBuffer.data);
+                    break;
+                case DynamicSortAlgorithm_std:
+                    std::sort(A, A + size, IndexUInt32::comparator);
+                    break;
+                default:
+                    break;
+                }
+
+            }
+            else {
+                switch (gather) {
+                case DynamicSortGather_bucket:
+                    bucket_IndexUInt32(A, size, algorithm);
+                    break;
+                case DynamicSortGather_counting:
+                    counting_IndexUInt32(A, size, algorithm);
+                    break;
+                case DynamicSortGather_merge:
+                    merge_IndexUInt32(A, size, algorithm);
+                    break;
+                default:
+                    break;
+                }
+            }
         }
 
     }

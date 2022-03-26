@@ -13,7 +13,6 @@
 namespace aRibeiro {
     namespace Sorting {
 
-
         enum DynamicSortGather {
             DynamicSortGather_none,
             DynamicSortGather_bucket,
@@ -100,6 +99,7 @@ namespace aRibeiro {
             PlatformSemaphore semaphore;
             ObjectBuffer auxBuffer;
             PlatformMutex mutex;
+            uint32_t useMultithreadStartingAtCount;
             
             void merge_job_int32(const int32_t* in, int32_t* out, int i, int element_count, int size);
             void merge_job_uint32(const uint32_t* in, uint32_t* out, int i, int element_count, int size);
@@ -128,7 +128,7 @@ namespace aRibeiro {
 
         public:
             
-            DynamicSort(ThreadPool* _threadPool);
+            DynamicSort(ThreadPool* _threadPool, uint32_t useMultithreadStartingAtCount = 64*1024);//64k
             ~DynamicSort();
 
             void sort_int32_t(int32_t* A, uint32_t size, DynamicSortGather gather = DynamicSortGather_counting, DynamicSortAlgorithm algorithm = DynamicSortAlgorithm_radix_counting);
