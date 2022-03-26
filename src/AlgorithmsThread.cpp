@@ -512,8 +512,12 @@ namespace aRibeiro {
                         radix_counting_sort_signed_index(job.sort_copy.sort._array_IndexInt32, job.sort_copy.sort._size, job.sort_copy.sort._tmp_array_IndexInt32);
                         break;
                     case DynamicSortAlgorithm_std:
-                        //std::sort(job.sort_copy.sort._array_IndexInt32, job.sort_copy.sort._array_IndexInt32 + job.sort_copy.sort._size);
-                        ARIBEIRO_ABORT(true, "comparator not implemented\n");
+                        std::sort(
+                            job.sort_copy.sort._array_IndexInt32, 
+                            job.sort_copy.sort._array_IndexInt32 + job.sort_copy.sort._size,
+                            IndexInt32::comparator
+                        );
+                        //ARIBEIRO_ABORT(true, "comparator not implemented\n");
                         break;
                     default:
                         break;
@@ -526,8 +530,12 @@ namespace aRibeiro {
                         radix_counting_sort_signed_index(job.sort_copy.sort._array_IndexInt32, job.sort_copy.sort._size, job.sort_copy.sort._tmp_array_IndexInt32);
                         break;
                     case DynamicSortAlgorithm_std:
-                        //std::sort(job.sort_copy.sort._array_IndexInt32, job.sort_copy.sort._array_IndexInt32 + job.sort_copy.sort._size);
-                        ARIBEIRO_ABORT(true, "comparator not implemented\n");
+                        std::sort(
+                            job.sort_copy.sort._array_IndexInt32, 
+                            job.sort_copy.sort._array_IndexInt32 + job.sort_copy.sort._size,
+                            IndexInt32::comparator
+                        );
+                        //ARIBEIRO_ABORT(true, "comparator not implemented\n");
                         break;
                     default:
                         break;
@@ -551,8 +559,12 @@ namespace aRibeiro {
                         radix_counting_sort_unsigned_index(job.sort_copy.sort._array_IndexUInt32, job.sort_copy.sort._size, job.sort_copy.sort._tmp_array_IndexUInt32);
                         break;
                     case DynamicSortAlgorithm_std:
-                        //std::sort(job.sort_copy.sort._array_IndexUInt32, job.sort_copy.sort._array_IndexUInt32 + job.sort_copy.sort._size);
-                        ARIBEIRO_ABORT(true, "comparator not implemented\n");
+                        std::sort(
+                            job.sort_copy.sort._array_IndexUInt32, 
+                            job.sort_copy.sort._array_IndexUInt32 + job.sort_copy.sort._size,
+                            IndexUInt32::comparator
+                        );
+                        //ARIBEIRO_ABORT(true, "comparator not implemented\n");
                         break;
                     default:
                         break;
@@ -565,8 +577,12 @@ namespace aRibeiro {
                         radix_counting_sort_unsigned_index(job.sort_copy.sort._array_IndexUInt32, job.sort_copy.sort._size, job.sort_copy.sort._tmp_array_IndexUInt32);
                         break;
                     case DynamicSortAlgorithm_std:
-                        //std::sort(job.sort_copy.sort._array_IndexUInt32, job.sort_copy.sort._array_IndexUInt32 + job.sort_copy.sort._size);
-                        ARIBEIRO_ABORT(true, "comparator not implemented\n");
+                        std::sort(
+                            job.sort_copy.sort._array_IndexUInt32, 
+                            job.sort_copy.sort._array_IndexUInt32 + job.sort_copy.sort._size,
+                            IndexUInt32::comparator
+                        );
+                        //ARIBEIRO_ABORT(true, "comparator not implemented\n");
                         break;
                     default:
                         break;
