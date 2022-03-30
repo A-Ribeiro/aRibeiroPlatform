@@ -124,7 +124,9 @@ namespace aRibeiro {
 #if defined(_WIN32)
 
             findAndReplaceAll(&lpApplicationName, "/", PlatformPath::SEPARATOR);
-            lpApplicationName += ".exe";
+
+            if (lpApplicationName.find(".") == std::string::npos)
+                lpApplicationName += ".exe";
 
             /*
             TCHAR buffer[MAX_PATH];
@@ -150,7 +152,7 @@ namespace aRibeiro {
             ZeroMemory(&processInformation, sizeof(processInformation));
 
             // start the program up
-            process_created = CreateProcess((LPCTSTR)lpApplicationName.c_str(),   // the path
+            process_created = CreateProcess(NULL, //(LPCTSTR)lpApplicationName.c_str(),   // the path
                 (LPSTR)&commandLine[0],        // Command line
                 NULL,           // Process handle not inheritable
                 NULL,           // Thread handle not inheritable
@@ -170,32 +172,87 @@ namespace aRibeiro {
 
 #elif defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
 
-    created_pid = fork ();
-    if (created_pid==0) { 
-        // child process
-        //execve replaces the current process memory with the new shell executable
+            created_pid = fork();
+            if (created_pid == 0) {
+                // child process
+                //execve replaces the current process memory with the new shell executable
 
-        std::vector<std::string> args_str = StringUtil::tokenizer(commandLine, " ");
-        
-        char ** argv = new char* [args_str.size()+2];
-        memset(argv, 0, (args_str.size()+2) *sizeof(char*));
-        for(int i=0;i<args_str.size();i++){
-            argv[i+1] = &args_str[i][0];
-        }
-        argv[0] = &lpApplicationName[0];
-        char *const envp[]={NULL,NULL};
+                std::vector<std::string> args_str = StringUtil::tokenizer(commandLine, " ");
 
-        //printf("Will execute: %s\n",lpApplicationName.c_str());
+                char** argv = new char* [args_str.size() + 2];
+                memset(argv, 0, (args_str.size() + 2) * sizeof(char*));
+                for (int i = 0; i < args_str.size(); i++) {
+                    argv[i + 1] = &args_str[i][0];
+                }
+                argv[0] = &lpApplicationName[0];
+                char* const envp[] = { NULL,NULL };
 
-        execve(lpApplicationName.c_str(), argv, envp);
-        perror ((std::string("Error to execute: ") + lpApplicationName).c_str());
-        exit(127);
-    }
+                //printf("Will execute: %s\n",lpApplicationName.c_str());
 
-    process_created = created_pid > 0;
+                execve(lpApplicationName.c_str(), argv, envp);
+                perror((std::string("Error to execute: ") + lpApplicationName).c_str());
+                exit(127);
+            }
+
+            process_created = created_pid > 0;
 
 #endif
 
+        }
+
+        bool waitExit(int* exit_code, uint32_t timeout_ms) {
+            PlatformAutoLock autoLock(&mutex);
+
+            if (isCreated()) {
+
+#if defined(_WIN32)
+                if (WaitForSingleObject(processInformation.hProcess, timeout_ms) == WAIT_TIMEOUT) {
+                    return false;
+                }
+                DWORD code;
+                if (GetExitCodeProcess(processInformation.hProcess, &code)) {
+                    *exit_code = (int)code;
+                    return true;
+                }
+#elif defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
+
+#endif
+
+
+
+            }
+
+            return false;
+        }
+
+        bool hasExitCode(int* exit_code) {
+            PlatformAutoLock autoLock(&mutex);
+            if (isCreated() && !isRunning()) {
+#if defined(_WIN32)
+                DWORD code;
+                if (GetExitCodeProcess(processInformation.hProcess, &code)) {
+                    *exit_code = (int)code;
+                    return true;
+                }
+#elif defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
+
+#endif
+
+            }
+            return false;
+        }
+
+        bool isRunning() {
+            PlatformAutoLock autoLock(&mutex);
+            if (isCreated()) {
+#if defined(_WIN32)
+                bool isTerminated = WaitForSingleObject(processInformation.hProcess, 0) == WAIT_OBJECT_0;
+                return !isTerminated;
+#elif defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
+#endif
+            }
+
+            return false;
         }
 
         bool isCreated() {
@@ -206,11 +263,13 @@ namespace aRibeiro {
         void horribleForceTermination() {
             PlatformAutoLock autoLock(&mutex);
             if (isCreated()) {
+                bool isRunningAux = isRunning();
                 exit_code = 0;
                 pid_str = "";
                 process_created = false;
 #if defined(_WIN32)
-                TerminateProcess(processInformation.hProcess, exit_code);
+                if (isRunningAux)
+                    TerminateProcess(processInformation.hProcess, exit_code);
                 CloseHandle(processInformation.hProcess);
                 CloseHandle(processInformation.hThread);
 #elif defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
@@ -260,10 +319,10 @@ namespace aRibeiro {
                 PlatformTime timer;
                 int64_t timer_acc = 0;
                 timer.update();
-                while (waitpid(created_pid, &status, WNOHANG) != created_pid){
+                while (waitpid(created_pid, &status, WNOHANG) != created_pid) {
                     timer.update();
                     timer_acc += timer.deltaTimeMicro;
-                    if (timer_acc > force_horrible_terminate_after_ms * 1000 ){
+                    if (timer_acc > force_horrible_terminate_after_ms * 1000) {
                         printf("[PlatformProcess] FORCE KILL CHILDREN TIMEOUT\n");
                         kill(created_pid, SIGKILL);
                         timeout = true;
@@ -272,11 +331,13 @@ namespace aRibeiro {
                     PlatformSleep::sleepMillis(50);
                 }
 
-                if (timeout){
+                if (timeout) {
                     exit_code = 0;
-                } else if (WIFEXITED(status)) {
+                }
+                else if (WIFEXITED(status)) {
                     exit_code = WEXITSTATUS(status);
-                } else
+                }
+                else
                     exit_code = -1;//exit with error (signal, for example)
 
                 process_created = false;
