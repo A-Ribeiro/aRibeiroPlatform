@@ -142,7 +142,7 @@ namespace aRibeiro {
                 //exit(0);
                 perror((std::string("Error to execute: ") + lpApplicationName).c_str());
                 
-                kill( getpid() , SIGABRT);//SIGKILL);
+                kill( getpid() , SIGKILL);//SIGABRT);//SIGKILL);
                 //exit(127);
             }
 
