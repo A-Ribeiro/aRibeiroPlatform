@@ -218,7 +218,7 @@ namespace aRibeiro {
                     currentThread->semaphoreUnLock();
 #endif
 
-                    int iResult = ::send(fd, (char*)&data[current_pos], size, 0);
+                    int iResult = ::send(fd, (char*)&data[current_pos], size, MSG_NOSIGNAL);
 
 #if !defined(_WIN32)
                     currentThread->semaphoreWaitDone(NULL);
