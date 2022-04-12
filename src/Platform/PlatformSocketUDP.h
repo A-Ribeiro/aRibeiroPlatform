@@ -19,6 +19,7 @@ namespace aRibeiro {
         int ttl;
         bool blocking;
         bool reuseAddress;
+        bool sendBroadcast;
 
         uint32_t read_timeout_ms;
         uint32_t write_timeout_ms;
@@ -49,6 +50,7 @@ namespace aRibeiro {
             setBlocking(blocking);
             setReuseAddress(reuseAddress);
             setTTL(ttl);
+            setSendBroadcast(true);
 
             read_timeout_ms = 0xffffffff;//INFINITE;
             write_timeout_ms = 0xffffffff;//INFINITE;
@@ -81,6 +83,7 @@ namespace aRibeiro {
             ttl = -1;
             blocking = false;
             reuseAddress = false;
+            sendBroadcast = false;
             memset(&addr_in, 0, sizeof(struct sockaddr_in));
 
             read_timeout_ms = 0xffffffff;//INFINITE;
@@ -125,6 +128,7 @@ namespace aRibeiro {
             ttl = -1;
             blocking = false;
             reuseAddress = false;
+            sendBroadcast = false;
             memset(&addr_in, 0, sizeof(struct sockaddr_in));
         }
 
@@ -190,6 +194,20 @@ namespace aRibeiro {
             ARIBEIRO_ABORT(
                 ::setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (char*)&timeout, sizeof(struct timeval)) == -1,
                 "setsockopt SO_RCVTIMEO error. %s",
+                SocketUtils::getLastSocketErrorMessage().c_str()
+            );
+        }
+
+        void setSendBroadcast(bool sendBroadcast) {
+            PlatformAutoLock auto_lock(&mutex);
+            ARIBEIRO_ABORT(this->fd == -1, "Socket not initialized.\n");
+
+            this->sendBroadcast = sendBroadcast;
+
+            int aux = (this->sendBroadcast) ? 1 : 0;
+            ARIBEIRO_ABORT(
+                ::setsockopt(fd, SOL_SOCKET, SO_BROADCAST, (char *)&aux, sizeof(int)) == -1,
+                "setsockopt SO_BROADCAST error. %s",
                 SocketUtils::getLastSocketErrorMessage().c_str()
             );
         }
