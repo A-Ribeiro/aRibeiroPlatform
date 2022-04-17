@@ -130,6 +130,13 @@ namespace aRibeiro {
             );
         }
 
+        void setBlocking(bool blocking) {
+            PlatformAutoLock auto_lock(&mutex);
+            ARIBEIRO_ABORT(this->fd == -1, "Socket not initialized.\n");
+
+            SocketUtils::SetSocketBlockingEnabled(fd, blocking);
+        }
+
         bool connect(const std::string &address_ip, uint16_t port) {
             PlatformAutoLock auto_lock(&mutex);
 
@@ -153,6 +160,106 @@ namespace aRibeiro {
                 addr_in.sin_addr.s_addr = inet_addr(address_ip.c_str());
             addr_in.sin_port = htons(port);
 
+
+#if defined(_WIN32)
+
+            setBlocking(false);
+
+            HANDLE wsa_connect_event = WSACreateEvent();
+            ARIBEIRO_ABORT(wsa_connect_event == WSA_INVALID_EVENT, "Error to create WSAEvent. Message: %s", SocketUtils::getLastSocketErrorMessage().c_str());
+
+            ARIBEIRO_ABORT(
+                ::WSAEventSelect(fd, wsa_connect_event, FD_CONNECT | FD_CLOSE) == SOCKET_ERROR,// FD_READ | FD_WRITE
+                "WSAEventSelect error. %s",
+                SocketUtils::getLastSocketErrorMessage().c_str()
+            );
+
+            ::connect(fd, (struct sockaddr*)&addr_in, sizeof(struct sockaddr_in));
+
+            bool connected = false;
+
+            aRibeiro::PlatformThread* currentThread = aRibeiro::PlatformThread::getCurrentThread();
+
+            DWORD dwWaitResult;
+            HANDLE handles_threadInterrupt_sem[2] = {
+                wsa_connect_event, // WAIT_OBJECT_0 + 0
+                currentThread->m_thread_interrupt_event // WAIT_OBJECT_0 + 1
+            };
+
+            DWORD dwWaitTime = INFINITE;
+
+            /*
+            if (read_timeout_ms != 0xffffffff)
+                dwWaitTime = read_timeout_ms;
+            */
+
+            dwWaitResult = WaitForMultipleObjects(
+                2,   // number of handles in array
+                handles_threadInterrupt_sem,     // array of thread handles
+                FALSE,          // wait until all are signaled
+                dwWaitTime // INFINITE //INFINITE
+            );
+
+            if (dwWaitResult == WAIT_TIMEOUT) {
+                connected = false;
+            }
+            else
+            // true if the interrupt is signaled (and only the interrupt...)
+            if (dwWaitResult == WAIT_OBJECT_0 + 1) {
+                connected = false;
+            }
+            else
+            // true if the socket is signaled (might have the interrupt or not...)
+            if (dwWaitResult == WAIT_OBJECT_0 + 0) {
+
+                WSANETWORKEVENTS NetworkEvents = { 0 };
+                //int nReturnCode = WSAWaitForMultipleEvents(1, &lphEvents[0], false, WSA_INFINITE, false);
+                //if (nReturnCode==WSA_WAIT_FAILED) 
+                    //throw MyException("WSA__WAIT_FAILED.\n");
+                ARIBEIRO_ABORT(
+                    WSAEnumNetworkEvents(fd, wsa_connect_event, &NetworkEvents) == SOCKET_ERROR,
+                    "WSAEnumNetworkEvents error. %s",
+                    SocketUtils::getLastSocketErrorMessage().c_str());
+
+                if (NetworkEvents.lNetworkEvents & FD_CONNECT) {
+                    connected = true;
+                    int error_code;
+                    int error_code_size = sizeof(error_code);
+                    if (getsockopt(fd, SOL_SOCKET, SO_ERROR, (char*)&error_code, &error_code_size) == 0) {
+                        connected = (error_code == 0);
+                    }
+                }
+                else if (NetworkEvents.lNetworkEvents & FD_CLOSE) {
+                    connected = false;
+                }
+                else {
+                    // any other error...
+                    connected = false;
+                }
+            }
+
+            if (wsa_connect_event != NULL) {
+                ::WSACloseEvent(wsa_connect_event);
+                wsa_connect_event = NULL;
+            }
+
+            if (!connected) {
+
+
+                printf("Failed to connect socket. %s\n", SocketUtils::getLastSocketErrorMessage().c_str());
+
+                signaled = true;
+
+                if (read_aquired) read_semaphore.release();
+                if (write_aquired) write_semaphore.release();
+
+                setBlocking(true);
+                return false;
+            }
+
+            setBlocking(true);
+#else
+
             if (::connect(fd, (struct sockaddr *)&addr_in, sizeof(struct sockaddr_in)) == -1) {
                 printf("Failed to connect socket. %s\n", SocketUtils::getLastSocketErrorMessage().c_str());
 
@@ -163,6 +270,8 @@ namespace aRibeiro {
 
                 return false;
             }
+
+#endif
 
 #if defined(_WIN32)
             wsa_read_event = WSACreateEvent();
