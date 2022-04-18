@@ -34,6 +34,9 @@ namespace aRibeiro
         const int IP_V4_HEADER_SIZE = 20;///< IPv4 RAW header size bytes
         const int UDP_IPV4_TOTAL_HEADER_SIZE = IP_V4_HEADER_SIZE + UDP_HEADER_SIZE;///< Header size in bytes when using UDP over IPv4
 
+        const int IP_V6_HEADER_SIZE = 40;///< IPv6 RAW header size bytes
+        const int UDP_IPV6_TOTAL_HEADER_SIZE = IP_V6_HEADER_SIZE + UDP_HEADER_SIZE;///< Header size in bytes when using UDP over IPv4
+
         //Known MTUs (Maximum transfer units)
 
         // Ethernet: 1500 - UDP_IPV4_TOTAL_HEADER_SIZE = 1472
@@ -50,11 +53,11 @@ namespace aRibeiro
         const int MINIMUM_MTU = 576;///< Minimum transfer unit (bytes). Used for packet lesser or equal this.
 
         //generates fragmentation
-        const int UDP_DATA_MAX_DATAGRAM_SIZE = UDP_MAX_PACKET_SIZE - UDP_IPV4_TOTAL_HEADER_SIZE;///< UDP max user data packet size (bytes).
+        const int UDP_DATA_MAX_DATAGRAM_SIZE = UDP_MAX_PACKET_SIZE - UDP_HEADER_SIZE;///< UDP max user data packet size (bytes).
 
-        const int UDP_DATA_MTU_ETHERNET = ETHERNET_MTU - UDP_IPV4_TOTAL_HEADER_SIZE;///< UDP user data packet size (bytes) to use in an Ethernet connection.
-        const int UDP_DATA_MTU_INTERNET = INTERNET_MTU - UDP_IPV4_TOTAL_HEADER_SIZE;///< UDP user data packet size (bytes) to use in an Internet connection.
-        const int UDP_DATA_MTU_MINIMUM = MINIMUM_MTU - UDP_IPV4_TOTAL_HEADER_SIZE;///< UDP user data packet size (bytes) to use as minimum packet size.
+        const int UDP_DATA_MTU_ETHERNET = ETHERNET_MTU - UDP_HEADER_SIZE;///< UDP user data packet size (bytes) to use in an Ethernet connection.
+        const int UDP_DATA_MTU_INTERNET = INTERNET_MTU - UDP_HEADER_SIZE;///< UDP user data packet size (bytes) to use in an Internet connection.
+        const int UDP_DATA_MTU_MINIMUM = MINIMUM_MTU - UDP_HEADER_SIZE;///< UDP user data packet size (bytes) to use as minimum packet size.
 
         const int UDP_DATA_MTU_LOCALHOST = UDP_DATA_MAX_DATAGRAM_SIZE;///< UDP user data packet size (bytes) to use in local connection.
 
