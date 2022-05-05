@@ -86,6 +86,7 @@ namespace aRibeiro {
                     //new (element.data) T();
                     //element.data->~T();
                 delete element.data;
+                it++;
             }
             in_use.clear();
 
