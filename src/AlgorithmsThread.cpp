@@ -421,9 +421,9 @@ namespace aRibeiro {
         }
 
         void DynamicSort::task_run() {
-
-            DynamicSortJob job = queue.dequeue();
-            if (queue.isSignaled())
+            bool isSignaled;
+            DynamicSortJob job = queue.dequeue(&isSignaled);
+            if (isSignaled)
                 return;
 
             switch (job.input_data_type) {

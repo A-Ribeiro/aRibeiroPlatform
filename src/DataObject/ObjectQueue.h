@@ -412,16 +412,22 @@ int main(int argc, char* argv[]){
             return T();
         }
 
-        T dequeue(bool ignoreSignal = false) {
+        T dequeue(bool *isSignaled = NULL, bool ignoreSignal = false) {
 
             if (blocking) {
-                if (!semaphore.blockingAcquire() && !ignoreSignal)
+                if (!semaphore.blockingAcquire() && !ignoreSignal){
+                    if (isSignaled != NULL)
+                        *isSignaled = true;
                     return T();
+                }
 
                 mutex.lock();
                 T result = list.front();
                 list.pop_front();
                 mutex.unlock();
+
+                if (isSignaled != NULL)
+                    *isSignaled = false;
                 return result;
             }
 
@@ -431,22 +437,32 @@ int main(int argc, char* argv[]){
                 T result = list.front();
                 list.pop_front();
                 mutex.unlock();
+                if (isSignaled != NULL)
+                    *isSignaled = false;
                 return result;
             }
             mutex.unlock();
+
+            if (isSignaled != NULL)
+                *isSignaled = false;
             return T();
         }
 
-        T rdequeue(bool ignoreSignal = false) {
+        T rdequeue(bool *isSignaled = NULL, bool ignoreSignal = false) {
 
             if (blocking) {
-                if (!semaphore.blockingAcquire() && !ignoreSignal)
+                if (!semaphore.blockingAcquire() && !ignoreSignal) {
+                    if (isSignaled != NULL)
+                        *isSignaled = true;
                     return T();
+                }
 
                 mutex.lock();
                 T result = list.back();
                 list.pop_back();
                 mutex.unlock();
+                if (isSignaled != NULL)
+                    *isSignaled = false;
                 return result;
             }
 
@@ -455,13 +471,17 @@ int main(int argc, char* argv[]){
                 T result = list.back();
                 list.pop_back();
                 mutex.unlock();
+                if (isSignaled != NULL)
+                    *isSignaled = false;
                 return result;
             }
             mutex.unlock();
+            if (isSignaled != NULL)
+                *isSignaled = false;
             return T();
         }
 
-        bool isSignaled() {
+        bool isSignaledFromCurrentThread() {
             return semaphore.isSignaled();
         }
     };

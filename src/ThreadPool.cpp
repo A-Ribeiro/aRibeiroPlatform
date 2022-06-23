@@ -3,9 +3,10 @@
 namespace aRibeiro {
 
 	void ThreadPool::run() {
+		bool isSignaled;
 		while (!PlatformThread::isCurrentThreadInterrupted()) {
-			TaskMethod_Fnc job = task_queue.dequeue();
-			if (task_queue.isSignaled())
+			TaskMethod_Fnc job = task_queue.dequeue(&isSignaled);
+			if (isSignaled)
 				return;
 			job();
 		}
