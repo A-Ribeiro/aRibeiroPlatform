@@ -70,7 +70,7 @@ namespace aRibeiro {
             //printf("while (available.size() > 0)\n");
             while (available.size() > 0) {
                 //printf("    while (available.size() > 0)\n");
-                ObjectPoolElement element = available.dequeue(true);
+                ObjectPoolElement element = available.dequeue(NULL,true);
 
                 if (!element.ignore_placement_new_delete)
                     new (element.data) T();
@@ -92,7 +92,7 @@ namespace aRibeiro {
 
             /*
             while (in_use.size() > 0) {
-                ObjectPoolElement element = in_use.dequeue(true);
+                ObjectPoolElement element = in_use.dequeue(NULL,true);
                 if (!element.ignore_placement_new_delete)
                     element.data->~T();
                 delete element.data;
