@@ -7,6 +7,8 @@
 
 namespace aRibeiro {
 
+    BEGIN_DECLARE_DELEGATE(OnAbortDelegate, const char* file, int line, const char* message) CALL_PATTERN(file, line, message) END_DECLARE_DELEGATE;
+
 class PlatformSignal {
 
 #if defined(_WIN32)
@@ -55,8 +57,12 @@ class PlatformSignal {
 #endif
 
 public:
+
     static void Set(void(*fnc)(int));
     static void Reset();
+
+    static void DefaultAbortFNC(const char* file, int line, const char* format, ...);
+    static OnAbortDelegate* OnAbortEvent();
 };
 
 }
