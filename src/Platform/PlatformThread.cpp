@@ -450,7 +450,7 @@ namespace aRibeiro {
         wait();
         
         if (shouldReleaseThreadID_byItself){
-            printf("PlatformThread::~PlatformThread() shouldReleaseThreadID_byItself = true\n");
+            printf("[%s] PlatformThread::~PlatformThread() shouldReleaseThreadID_byItself = true\n", name.c_str());
             PlatformSleep::sleepMillis(10);
             while (waitCalls>0)
                 PlatformSleep::sleepMillis(10);
