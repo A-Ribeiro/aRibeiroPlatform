@@ -670,7 +670,8 @@ namespace aRibeiro {
             for (int i = 0; i < size; i++) {
                 int32_t element32 = A[i];
                 int64_t element64 = (int64_t)element32;
-                uint32_t index = ((element64 - min) * bucket_count) / delta;
+                //uint32_t index = ((element64 - min) * bucket_count) / delta;
+                uint32_t index = ((element64 - min) * bucket_count) >> 32;
                 counting[index]++;
             }
 
@@ -689,7 +690,8 @@ namespace aRibeiro {
             for (uint32_t i = 0; i < size; i++) {
                 int32_t element32 = A[i];
                 int64_t element64 = (int64_t)element32;
-                uint32_t index = ((element64 - min) * bucket_count) / delta;
+                //uint32_t index = ((element64 - min) * bucket_count) / delta;
+                uint32_t index = ((element64 - min) * bucket_count) >> 32;
                 counter_type out_index = counting[index];
                 counting[index]++;
                 aux[out_index] = element32;
@@ -851,8 +853,10 @@ namespace aRibeiro {
             for (int i = 0; i < size; i++) {
                 uint32_t element32 = A[i];
                 int64_t element64 = (int64_t)element32 - min;
-                uint32_t index = (element64 * bucket_count) / delta;
+                //uint32_t index = (element64 * bucket_count) / delta;
+                uint32_t index = (element64 * bucket_count) >> 32;
                 counting[index]++;
+                //printf("index %u\n", index);
             }
 
             //compute offset
@@ -870,7 +874,8 @@ namespace aRibeiro {
             for (uint32_t i = 0; i < size; i++) {
                 uint32_t element32 = A[i];
                 int64_t element64 = (int64_t)element32 - min;
-                uint32_t index = (element64 * bucket_count) / delta;
+                //uint32_t index = (element64 * bucket_count) / delta;
+                uint32_t index = (element64 * bucket_count) >> 32;
                 counter_type out_index = counting[index];
                 counting[index]++;
                 aux[out_index] = element32;
