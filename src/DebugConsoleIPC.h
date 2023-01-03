@@ -15,8 +15,8 @@ namespace aRibeiro {
     public:
         PlatformLowLatencyQueueIPC queue;
 
-        DebugConsoleIPC(uint32_t mode = PlatformQueueIPC_WRITE) :
-            queue("debug_console", mode, 1024, sizeof(char) * 64) {
+        DebugConsoleIPC(uint32_t mode = PlatformQueueIPC_WRITE, bool blocking = false) :
+            queue("debug_console", mode, 1024, sizeof(char) * 64, blocking) {
 
             this->mode = mode;
 
@@ -28,11 +28,18 @@ namespace aRibeiro {
 
             ::printf("read main loop\n");
             fflush(stdin);
+            
             ObjectBuffer buffer;
-            while (queue.read(&buffer)) {
-                //::printf("data received: %i", buffer.size);
-                ::printf("%s", (char*)buffer.data);
-                fflush(stdin);
+
+            while (true){
+                while (queue.read(&buffer)) {
+                    //::printf("data received: %i", buffer.size);
+                    ::printf("%s", (char*)buffer.data);
+                    fflush(stdin);
+                }
+                if (queue.isSignaled())
+                    return;
+                PlatformSleep::sleepMillis(1);
             }
         }
 

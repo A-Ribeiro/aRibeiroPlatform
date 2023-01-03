@@ -2,7 +2,11 @@
 #include "PlatformTime.h"
 
 #if defined(OS_TARGET_win)
-#include <timeapi.h>
+    #include <timeapi.h>
+    #include <processthreadsapi.h>
+#else
+    #include <sched.h>
+    #include <errno.h>
 #endif
 
 namespace aRibeiro {
@@ -61,6 +65,22 @@ namespace aRibeiro {
 
 #endif
 
+    }
+
+
+    void PlatformSleep::yield(){
+
+#if defined(OS_TARGET_win)
+        //yield();
+        //UseWindowsHighResolutionClock::sleep(0);
+        if (!SwitchToThread())
+            UseWindowsHighResolutionClock::sleep(0);
+#else
+        //usleep(0) << same effect...
+        int rc = sched_yield();
+        ARIBEIRO_ABORT(rc!=0, "Error: %s", strerror( errno ));
+#endif
+        
     }
 
 }

@@ -74,6 +74,8 @@ namespace aRibeiro {
         /// \param micros microseconds
         ///
         static void busySleepMicro(int64_t micros);
+
+        static void yield();
     };
 
 }
