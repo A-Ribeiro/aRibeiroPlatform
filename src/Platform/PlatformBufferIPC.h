@@ -44,6 +44,11 @@ namespace aRibeiro {
 
         bool isFirst;
 
+        void releaseAll();
+        void onAbort(const char *file, int line, const char *message);
+        PlatformMutex shm_mutex;
+        bool force_finish_initialization;
+
         //private copy constructores, to avoid copy...
         PlatformBufferIPC(const PlatformBufferIPC& v){}
         void operator=(const PlatformBufferIPC& v){}

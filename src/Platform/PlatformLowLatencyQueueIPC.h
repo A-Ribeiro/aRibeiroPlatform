@@ -22,6 +22,11 @@ namespace aRibeiro {
 
         void write_buffer(const uint8_t* data, uint32_t size);
         void read_buffer(uint8_t* data, uint32_t size);
+
+        void releaseAll(bool release_semaphore_ipc);
+        void onAbort(const char *file, int line, const char *message);
+
+        PlatformMutex shm_mutex;
     public:
 
         // unblocked if the containing threads have been interrupted...
@@ -63,7 +68,7 @@ namespace aRibeiro {
 
         // only check if this queue is signaled for the current thread... 
         // it may be active in another thread...
-        bool isSignaled() const;
+        bool isSignaled();
 
     };
 

@@ -2,6 +2,7 @@
 #include <aRibeiroPlatform/PlatformThread.h>
 #include <aRibeiroPlatform/PlatformSleep.h>
 #include <aRibeiroPlatform/PlatformPath.h>
+#include <aRibeiroPlatform/PlatformSignal.h>
 
 namespace aRibeiro {
 
@@ -53,6 +54,8 @@ namespace aRibeiro {
 
 
     void PlatformBufferIPC::lock(bool from_constructor) {
+        PlatformAutoLock autoLock(&shm_mutex);
+
 #if defined(OS_TARGET_win)
         // lock semaphore
         ARIBEIRO_ABORT(WaitForSingleObject(buffer_semaphore, INFINITE) != WAIT_OBJECT_0, "Error to lock queue semaphore. Error code: %s\n", GetLastErrorToString().c_str());
@@ -73,7 +76,8 @@ namespace aRibeiro {
             
         } else {
             // while semaphore is signaled, try to aquire until block...
-            while (sem_wait(buffer_semaphore) != 0);
+            if (buffer_semaphore != NULL)
+                while (sem_wait(buffer_semaphore) != 0);
         }
 #endif
     }
@@ -93,7 +97,8 @@ namespace aRibeiro {
             f_lock = -1;
         }
         else {
-            sem_post(buffer_semaphore);
+            if (buffer_semaphore != NULL)
+                sem_post(buffer_semaphore);
         }
 #endif
     }
@@ -103,6 +108,12 @@ namespace aRibeiro {
         //uint32_t mode,
         uint32_t buffer_size_
     ) {
+
+        //PlatformAutoLock autoLock(&shm_mutex);
+        shm_mutex.lock();
+        PlatformSignal::OnAbortEvent()->add(this, &PlatformBufferIPC::onAbort);
+
+        force_finish_initialization = true;
 
         size = buffer_size_;
 
@@ -193,6 +204,7 @@ namespace aRibeiro {
             O_CREAT | O_RDWR,
             S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
         if (buffer_handle == -1) {
+            buffer_handle = BUFFER_HANDLE_NULL;
             unlock(true);
             ARIBEIRO_ABORT(true, "Error to create the buffer IPC queue. Error code: %s\n", strerror(errno) );
         }
@@ -219,7 +231,10 @@ namespace aRibeiro {
             1
         );
 
-        ARIBEIRO_ABORT(buffer_semaphore == SEM_FAILED, "Error to create global semaphore. Error code: %s\n", strerror(errno) );
+        if (buffer_semaphore == SEM_FAILED) {
+            buffer_semaphore = NULL;
+            ARIBEIRO_ABORT(true, "Error to create global semaphore. Error code: %s\n", strerror(errno) );
+        }
 
         lock();//lock the created semaphore
 
@@ -299,9 +314,26 @@ namespace aRibeiro {
         #endif
 
         unlock(true);
+
+        force_finish_initialization = false;
+        shm_mutex.unlock();
     }
 
     PlatformBufferIPC::~PlatformBufferIPC() {
+        releaseAll();
+    }
+    
+    void PlatformBufferIPC::onAbort(const char *file, int line, const char *message){
+        PlatformAutoLock autoLock(&shm_mutex);
+        if (force_finish_initialization)
+            finishInitialization();
+        releaseAll();
+    }
+    
+    void PlatformBufferIPC::releaseAll(){
+        PlatformAutoLock autoLock(&shm_mutex);
+
+        PlatformSignal::OnAbortEvent()->remove(this, &PlatformBufferIPC::onAbort);
 
         #if !defined(OS_TARGET_win)
             lock(true);
@@ -321,10 +353,12 @@ namespace aRibeiro {
             (*count)--;
 
 #if defined(OS_TARGET_win)
-            UnmapViewOfFile(real_data_ptr);
+            if (real_data_ptr != 0)
+                UnmapViewOfFile(real_data_ptr);
             CloseHandle(buffer_handle);
 #elif defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
-            munmap(real_data_ptr, size + sizeof(uint32_t));
+            if (real_data_ptr != MAP_FAILED)
+                munmap(real_data_ptr, size + sizeof(uint32_t));
             close(buffer_handle); //close FD
             //shm_unlink(buffer_name.c_str());
 #endif

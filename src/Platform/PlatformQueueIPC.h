@@ -66,6 +66,11 @@ namespace aRibeiro {
         //private copy constructores, to avoid copy...
         PlatformQueueIPC(const PlatformQueueIPC& v){}
         void operator=(const PlatformQueueIPC& v){}
+
+        void releaseAll();
+        void onAbort(const char *file, int line, const char *message);
+
+        PlatformMutex shm_mutex;
     public:
 
     #if defined(OS_TARGET_win)

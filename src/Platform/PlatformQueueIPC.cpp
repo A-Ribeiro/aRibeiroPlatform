@@ -2,6 +2,7 @@
 #include <aRibeiroPlatform/PlatformThread.h>
 #include <aRibeiroPlatform/PlatformSleep.h>
 #include <aRibeiroPlatform/PlatformPath.h>
+#include <aRibeiroPlatform/PlatformSignal.h>
 
 namespace aRibeiro {
 
@@ -53,9 +54,12 @@ namespace aRibeiro {
 
 
     void PlatformQueueIPC::lock(bool from_constructor) {
+        PlatformAutoLock autoLock(&shm_mutex);
+
 #if defined(OS_TARGET_win)
         // lock semaphore
-        ARIBEIRO_ABORT(WaitForSingleObject(queue_semaphore, INFINITE) != WAIT_OBJECT_0, "Error to lock queue semaphore. Error code: %s\n", GetLastErrorToString().c_str());
+        if (queue_semaphore != NULL )
+            ARIBEIRO_ABORT(WaitForSingleObject(queue_semaphore, INFINITE) != WAIT_OBJECT_0, "Error to lock queue semaphore. Error code: %s\n", GetLastErrorToString().c_str());
 #elif defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
         if (from_constructor) {
 
@@ -72,15 +76,19 @@ namespace aRibeiro {
 
         } else {
             // while semaphore is signaled, try to aquire until block...
-            while (sem_wait(queue_semaphore) != 0);
+            if (queue_semaphore != NULL )
+                while (sem_wait(queue_semaphore) != 0);
         }
 #endif
     }
 
     void PlatformQueueIPC::unlock(bool from_constructor) {
+        PlatformAutoLock autoLock(&shm_mutex);
+
 #if defined(OS_TARGET_win)
         // release semaphore
-        ARIBEIRO_ABORT(!ReleaseSemaphore(queue_semaphore, 1, NULL), "Error to unlock queue semaphore. Error code: %s\n", GetLastErrorToString().c_str());
+        if (queue_semaphore != NULL )
+            ARIBEIRO_ABORT(!ReleaseSemaphore(queue_semaphore, 1, NULL), "Error to unlock queue semaphore. Error code: %s\n", GetLastErrorToString().c_str());
 #elif defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
         if (from_constructor) {
             ARIBEIRO_ABORT(f_lock == -1, "Trying to unlock a non initialized lock from constructor.\n");
@@ -92,7 +100,8 @@ namespace aRibeiro {
             f_lock = -1;
         }
         else {
-            sem_post(queue_semaphore);
+            if (queue_semaphore != NULL )
+                sem_post(queue_semaphore);
         }
 #endif
     }
@@ -101,6 +110,9 @@ namespace aRibeiro {
         uint32_t mode,
         uint32_t queue_size_, 
         uint32_t buffer_size_) {
+
+        PlatformAutoLock autoLock(&shm_mutex);
+        PlatformSignal::OnAbortEvent()->add(this, &PlatformQueueIPC::onAbort);
 
         queue_semaphore = NULL;
         queue_header_handle = BUFFER_HANDLE_NULL;
@@ -174,6 +186,7 @@ namespace aRibeiro {
             O_CREAT | O_RDWR,
             S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
         if (queue_header_handle == -1) {
+            queue_header_handle = BUFFER_HANDLE_NULL;
             unlock(true);
             ARIBEIRO_ABORT(true, "Error to create the header IPC queue. Error code: %s\n", strerror(errno) );
         }
@@ -217,6 +230,7 @@ namespace aRibeiro {
             );
 
             if (queue_semaphore == SEM_FAILED) {
+                queue_semaphore = NULL;
                 unlock(true);
                 ARIBEIRO_ABORT(true, "Error to create global semaphore. Error code: %s\n", strerror(errno));
             }
@@ -241,6 +255,7 @@ namespace aRibeiro {
             );
 
             if (queue_semaphore == SEM_FAILED) {
+                queue_semaphore = NULL;
                 unlock(true);
                 ARIBEIRO_ABORT(true, "Error to create global semaphore. Error code: %s\n", strerror(errno));
             }
@@ -293,6 +308,8 @@ namespace aRibeiro {
             O_CREAT | O_RDWR,
             S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
         if (queue_buffer_handle == -1) {
+            queue_buffer_handle = BUFFER_HANDLE_NULL;
+
             unlock();
             unlock(true);
             ARIBEIRO_ABORT(true, "Error to create the buffer IPC queue. Error code: %s\n", strerror(errno));
@@ -456,6 +473,10 @@ namespace aRibeiro {
 
     bool PlatformQueueIPC::writeHasEnoughSpace(uint32_t size, bool lock_if_true){
 
+        PlatformAutoLock autoLock(&shm_mutex);
+        if ( queue_semaphore == NULL )
+            return false;
+
         uint32_t size_request = size + sizeof(PlatformBufferHeader);
 
         ARIBEIRO_ABORT(size_request > queue_header_ptr->capacity, "Buffer too big for this queue.\n");
@@ -480,6 +501,12 @@ namespace aRibeiro {
 
     bool PlatformQueueIPC::write(const uint8_t *data, uint32_t size, bool blocking, bool ignore_first_lock) {
 
+        shm_mutex.lock();
+        if ( queue_semaphore == NULL ){
+            shm_mutex.unlock();
+            return false;
+        }
+
         uint32_t size_request = size + sizeof(PlatformBufferHeader);
 
         ARIBEIRO_ABORT(size_request > queue_header_ptr->capacity, "Buffer too big for this queue.\n");
@@ -490,11 +517,18 @@ namespace aRibeiro {
             uint32_t remaining_space = queue_header_ptr->capacity - queue_header_ptr->size;
             while (size_request > remaining_space) {
                 unlock();
+                shm_mutex.unlock();
 
                 if (!blocking || PlatformThread::isCurrentThreadInterrupted())
                     return false;
 
                 PlatformSleep::sleepMillis(1);
+                
+                shm_mutex.lock();
+                if ( queue_semaphore == NULL ){
+                    shm_mutex.unlock();
+                    return false;
+                }
                 lock();
                 remaining_space = queue_header_ptr->capacity - queue_header_ptr->size;
             }
@@ -508,6 +542,7 @@ namespace aRibeiro {
 
         //if (!ignore_first_lock)
         unlock();
+        shm_mutex.unlock();
 
         return true;
     }
@@ -518,6 +553,10 @@ namespace aRibeiro {
 
 
     bool PlatformQueueIPC::readHasElement(bool lock_if_true) {
+        PlatformAutoLock autoLock(&shm_mutex);
+        if ( queue_semaphore == NULL )
+            return false;
+
         lock();
 
         if (queue_header_ptr->size > 0) {
@@ -533,6 +572,13 @@ namespace aRibeiro {
 
     bool PlatformQueueIPC::read(ObjectBuffer *outputBuffer, bool blocking, bool ignore_first_lock) {
 
+        //PlatformAutoLock autoLock(&shm_mutex);
+        shm_mutex.lock();
+        if ( queue_semaphore == NULL ) {
+            shm_mutex.unlock();
+            return false;
+        }
+
         uint32_t total_chuncks = 0;
 
         if (!ignore_first_lock) {
@@ -540,11 +586,18 @@ namespace aRibeiro {
 
             while (queue_header_ptr->size == 0) {
                 unlock();
+                shm_mutex.unlock();
 
                 if (!blocking || PlatformThread::isCurrentThreadInterrupted())
                     return false;
 
                 PlatformSleep::sleepMillis(1);
+                
+                shm_mutex.lock();
+                if ( queue_semaphore == NULL ) {
+                    shm_mutex.unlock();
+                    return false;
+                }
                 lock();
             }
         }
@@ -556,11 +609,25 @@ namespace aRibeiro {
 
         //if (!ignore_first_lock)
         unlock();
+        shm_mutex.unlock();
 
         return true;
     }
 
-    PlatformQueueIPC::~PlatformQueueIPC() {
+
+    void PlatformQueueIPC::onAbort(const char *file, int line, const char *message){
+        releaseAll();
+    }
+
+    PlatformQueueIPC::~PlatformQueueIPC()  {
+        releaseAll();
+    }
+
+    void PlatformQueueIPC::releaseAll() {
+        PlatformAutoLock autoLock(&shm_mutex);
+
+        PlatformSignal::OnAbortEvent()->remove(this, &PlatformQueueIPC::onAbort);
+
         #if !defined(OS_TARGET_win)
             lock(true);
             bool is_last_queue = false;
@@ -574,10 +641,12 @@ namespace aRibeiro {
 
         if (queue_buffer_handle != BUFFER_HANDLE_NULL) {
 #if defined(OS_TARGET_win)
-            UnmapViewOfFile(queue_buffer_ptr);
+            if (queue_buffer_ptr != 0)
+                UnmapViewOfFile(queue_buffer_ptr);
             CloseHandle(queue_buffer_handle);
 #elif defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
-            munmap(queue_buffer_ptr, queue_header_ptr->capacity);
+            if (queue_buffer_ptr != MAP_FAILED)
+                munmap(queue_buffer_ptr, queue_header_ptr->capacity);
             close(queue_buffer_handle); //close FD
             //shm_unlink(buffer_name.c_str());
 #endif
@@ -589,10 +658,12 @@ namespace aRibeiro {
             queue_header_ptr->subscribers_count--;
 
 #if defined(OS_TARGET_win)
-            UnmapViewOfFile(queue_header_ptr);
+            if (queue_header_ptr != 0)
+                UnmapViewOfFile(queue_header_ptr);
             CloseHandle(queue_header_handle);
 #elif defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
-            munmap(queue_header_ptr, sizeof(PlatformQueueHeader));
+            if (queue_header_ptr != MAP_FAILED)
+                munmap(queue_header_ptr, sizeof(PlatformQueueHeader));
             close(queue_header_handle); //close FD
             //shm_unlink(header_name.c_str());
 #endif
