@@ -374,11 +374,11 @@ namespace aRibeiro {
         void forceCloseWindows() {
 
 #if defined(OS_TARGET_win)
-            PlatformAutoLock autoLock(&close_mutex);
+            /*PlatformAutoLock autoLock(&close_mutex);
             if (semaphore != NULL) {
                 CloseHandle(semaphore);
                 semaphore = NULL;
-            }
+            }*/
 #endif
 
         }

@@ -222,6 +222,50 @@ namespace aRibeiro {
         return result;
     }
 
+    void _thread_at_exit() {
+        printf("_thread_at_exit ... \n");
+
+        PlatformThread::getMainThread()->interrupt();
+
+        PlatformThread* currentThread = PlatformThread::getCurrentThread();
+
+        bool allThreadsFinalized = false;
+
+        PlatformTime time;
+
+        time.update();
+        float time_acc = 0;
+        while (!allThreadsFinalized) {
+            allThreadsFinalized = true;
+
+            PlatformThread_OpenedThreadManager::Instance()->openedThreadsLock.lock();
+            //printf("Interrupting %u threads...\n", PlatformThread_OpenedThreadManager::Instance()->openedThreads.size());
+            std::map<THREAD_ID_TYPE, PlatformThread*>::iterator it;
+            for (it = PlatformThread_OpenedThreadManager::Instance()->openedThreads.begin(); it != PlatformThread_OpenedThreadManager::Instance()->openedThreads.end(); it++) {
+                PlatformThread* thread = it->second;
+                //if (thread != currentThread) 
+                {
+                    //printf("interrupt\n");
+                    thread->interrupt();
+                    allThreadsFinalized = false;
+                }
+            }
+            PlatformThread_OpenedThreadManager::Instance()->openedThreadsLock.unlock();
+
+            if (!allThreadsFinalized) {
+                //printf(".^_^."); fflush(stdout);
+                PlatformSleep::sleepMillis(300);
+            }
+            time.update();
+            time_acc += time.deltaTime;
+            if (time_acc > 30.0f) {
+                printf("[FORCING EXIT] 30 seconds timeout trying to interrupt opened threads.\n");
+                break;
+            }
+        }
+
+    }
+
     PlatformThread* PlatformThread::getMainThread() {
         // force set the global thread priority
         getGlobalThreadPriority();
@@ -231,8 +275,10 @@ namespace aRibeiro {
         //   Fix finalization issues related to the main thread...
         PlatformThread_OpenedThreadManager::Instance();
         static PlatformThread mainThread;
-        if (mainThread.name.size() == 0)
+        if (mainThread.name.size() == 0) {
+            OnAbortBeforeExit = _thread_at_exit;
             mainThread.name = "Main Thread";
+        }
         return &mainThread;
     }
 

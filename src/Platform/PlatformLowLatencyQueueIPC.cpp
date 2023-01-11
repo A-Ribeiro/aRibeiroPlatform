@@ -588,6 +588,8 @@ namespace aRibeiro {
 
         shm_mutex.lock();
         if ( queue_semaphore == NULL ) {
+            if (blocking_on_read)
+                semaphore_ipc->release();
             shm_mutex.unlock();
             return false;
         }
