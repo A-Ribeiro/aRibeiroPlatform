@@ -247,7 +247,8 @@ namespace aRibeiro {
                 {
                     //printf("interrupt\n");
                     thread->interrupt();
-                    allThreadsFinalized = false;
+                    if (thread != currentThread)
+                        allThreadsFinalized = false;
                 }
             }
             PlatformThread_OpenedThreadManager::Instance()->openedThreadsLock.unlock();
