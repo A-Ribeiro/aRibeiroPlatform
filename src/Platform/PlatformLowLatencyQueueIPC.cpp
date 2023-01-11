@@ -679,6 +679,12 @@ namespace aRibeiro {
                 semaphore_ipc = NULL;
             }
         }
+#if defined(OS_TARGET_win)
+        else if (semaphore_ipc != NULL) {
+            // force close handle...
+            semaphore_ipc->forceCloseWindows();
+        }
+#endif
 
         unlock();
 

@@ -4,6 +4,8 @@
 #include <aRibeiroCore/common.h>
 #include <aRibeiroPlatform/PlatformThread.h>
 #include <aRibeiroPlatform/PlatformSleep.h>
+#include <aRibeiroPlatform/PlatformMutex.h>
+#include <aRibeiroPlatform/PlatformAutoLock.h>
 
 
 #if defined(OS_TARGET_win)
@@ -77,6 +79,9 @@ namespace aRibeiro {
 
     #if defined(OS_TARGET_win)
         HANDLE semaphore;
+
+        PlatformMutex close_mutex;
+
     #elif defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
         sem_t* semaphore;
     #endif
@@ -147,6 +152,7 @@ namespace aRibeiro {
         }
         virtual ~PlatformSemaphoreIPC(){
     #if defined(OS_TARGET_win)
+            PlatformAutoLock autoLock(&close_mutex);
             if (semaphore != NULL)
                 CloseHandle(semaphore);
             semaphore = NULL;
@@ -362,6 +368,18 @@ namespace aRibeiro {
             if (semaphore != NULL)
                 sem_unlink( name.c_str() );
     #endif
+
+        }
+
+        void forceCloseWindows() {
+
+#if defined(OS_TARGET_win)
+            PlatformAutoLock autoLock(&close_mutex);
+            if (semaphore != NULL) {
+                CloseHandle(semaphore);
+                semaphore = NULL;
+            }
+#endif
 
         }
 
