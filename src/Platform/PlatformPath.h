@@ -243,6 +243,9 @@ namespace aRibeiro {
         /// \param outFileExt returns extension from filename
         static void splitPathString(const std::string &input, std::string *outFolder, std::string *outFilename, std::string *outFileWOExt, std::string *outFileExt);
 
+
+
+        static std::string getAbsolutePath(const std::string &path);
     };
 
 }

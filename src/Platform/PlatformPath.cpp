@@ -514,4 +514,18 @@ namespace aRibeiro {
 
     }
 
+    std::string PlatformPath::getAbsolutePath(const std::string& path) {
+#ifdef _WIN32
+        char fullFilename[MAX_PATH];
+        if (GetFullPathNameA(path.c_str(), MAX_PATH, fullFilename, nullptr) > 0)
+            return fullFilename;
+        return path;
+#else
+        char resolved_path[PATH_MAX];
+        if (realpath(path.c_str(), resolved_path) != NULL)
+            return resolved_path;
+        return path;
+#endif
+    }
+
 }
