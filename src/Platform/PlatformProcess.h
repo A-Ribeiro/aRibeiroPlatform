@@ -100,10 +100,8 @@ namespace aRibeiro {
 
 #endif
 
-        static void findAndReplaceAll(std::string* data, const std::string& toSearch, const std::string& replaceStr);
-
     public:
-        PlatformProcess(const std::string& _lpApplicationName, const std::string& _commandLine, int _force_horrible_terminate_after_ms = 5000);
+        PlatformProcess(const std::string& _lpApplicationName, const std::vector<std::string>& vector_argv, int _force_horrible_terminate_after_ms = 5000);
         bool waitExit(int* exit_code, uint32_t timeout_ms);
         int getExitCode();
         bool isRunning();
