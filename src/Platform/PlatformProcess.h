@@ -15,6 +15,7 @@
 #if defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
 
 #include <sys/wait.h>
+#include <aRibeiroPlatform/UnixPipe.h>
 
 #endif
 
@@ -101,7 +102,11 @@ namespace aRibeiro {
 #endif
 
     public:
-        PlatformProcess(const std::string& _lpApplicationName, const std::vector<std::string>& vector_argv, int _force_horrible_terminate_after_ms = 5000);
+        PlatformProcess(const std::string& _lpApplicationName, const std::vector<std::string>& vector_argv, int _force_horrible_terminate_after_ms = 5000
+        #if defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
+            ,UnixPipe *pipe_stdin = NULL, UnixPipe *pipe_stdout = NULL, UnixPipe *pipe_stderr = NULL
+        #endif
+        );
         bool waitExit(int* exit_code, uint32_t timeout_ms);
         int getExitCode();
         bool isRunning();

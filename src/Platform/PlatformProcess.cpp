@@ -8,7 +8,12 @@ extern char **environ;
 namespace aRibeiro
 {
 
-    PlatformProcess::PlatformProcess(const std::string &_lpApplicationName, const std::vector<std::string> &vector_argv, int _force_horrible_terminate_after_ms)
+    PlatformProcess::PlatformProcess(const std::string &_lpApplicationName, const std::vector<std::string> &vector_argv, int _force_horrible_terminate_after_ms
+#if defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
+                                     ,
+                                     UnixPipe *pipe_stdin, UnixPipe *pipe_stdout, UnixPipe *pipe_stderr
+#endif
+    )
     {
         exit_code = 0;
         pid_str = "";
@@ -69,10 +74,69 @@ namespace aRibeiro
 
 #elif defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
 
+        // resolve app name before fork
+        if (!PlatformPath::isFile(lpApplicationName))
+        {
+            // search executable in path variable
+            char *dup = strdup(getenv("PATH"));
+            char *s = dup;
+            char *p = NULL;
+            do
+            {
+                p = strchr(s, ':');
+                if (p != NULL)
+                {
+                    p[0] = 0;
+                }
+                std::string exe_path = std::string(s) + PlatformPath::SEPARATOR + lpApplicationName;
+                if (PlatformPath::isFile(exe_path))
+                {
+                    // check can execute
+                    struct stat st;
+                    if (stat(exe_path.c_str(), &st) >= 0)
+                    {
+                        if ((st.st_mode & S_IEXEC) != 0)
+                        {
+                            printf("Executable found at: %s\n", exe_path.c_str());
+                            lpApplicationName = exe_path;
+                            break;
+                        }
+                    }
+                }
+                s = p + 1;
+            } while (p != NULL);
+            free(dup);
+        }
+
         created_pid = fork();
         if (created_pid == 0)
         {
             // child process
+            // set pipes
+            if (pipe_stdin == NULL)
+                SinkStdFD(STDIN_FILENO);
+            else
+            {
+                pipe_stdin->aliasReadAs(STDIN_FILENO);
+                pipe_stdin->close();
+            }
+
+            if (pipe_stdout == NULL)
+                SinkStdFD(STDOUT_FILENO);
+            else
+            {
+                pipe_stdout->aliasWriteAs(STDOUT_FILENO);
+                pipe_stdout->close();
+            }
+
+            if (pipe_stderr == NULL)
+                SinkStdFD(STDERR_FILENO);
+            else
+            {
+                pipe_stderr->aliasReadAs(STDERR_FILENO);
+                pipe_stderr->close();
+            }
+
             // execve replaces the current process memory with the new shell executable
 
             std::vector<std::string> vector_argv_local = vector_argv;
@@ -82,41 +146,7 @@ namespace aRibeiro
             {
                 argv[i + 1] = &vector_argv_local[i][0];
             }
-
-            if (!PlatformPath::isFile(lpApplicationName))
-            {
-                // search executable in path variable
-                char *dup = strdup(getenv("PATH"));
-                char *s = dup;
-                char *p = NULL;
-                do
-                {
-                    p = strchr(s, ':');
-                    if (p != NULL)
-                    {
-                        p[0] = 0;
-                    }
-                    std::string exe_path = std::string(s) + PlatformPath::SEPARATOR + lpApplicationName;
-                    if (PlatformPath::isFile(exe_path))
-                    {
-                        // check can execute
-                        struct stat st;
-                        if (stat(exe_path.c_str(), &st) >= 0)
-                        {
-                            if ((st.st_mode & S_IEXEC) != 0)
-                            {
-                                printf("Executable found at: %s\n", exe_path.c_str());
-                                lpApplicationName = exe_path;
-                                break;
-                            }
-                        }
-                    }
-                    s = p + 1;
-                } while (p != NULL);
-                free(dup);
-            }
-
-            printf("[PlatformProcess] %s %s\n", lpApplicationName.c_str(), commandLine.c_str());
+            // printf("[PlatformProcess] %s %s\n", lpApplicationName.c_str(), commandLine.c_str());
 
             argv[0] = &lpApplicationName[0];
             // char* const envp[] = { NULL,NULL };
@@ -128,6 +158,18 @@ namespace aRibeiro
 
             kill(getpid(), SIGKILL); // SIGABRT);//SIGKILL);
             // exit(127);
+        }
+        else
+        {
+            // close unused host side pipe writter/reader
+            if (pipe_stdin != NULL)
+                pipe_stdin->closeReadFD();
+
+            if (pipe_stdout != NULL)
+                pipe_stdout->closeWriteFD();
+
+            if (pipe_stderr != NULL)
+                pipe_stderr->closeWriteFD();
         }
 
         process_created = created_pid > 0;
