@@ -102,6 +102,9 @@ namespace aRibeiro {
 #endif
 
     public:
+
+        static bool ApplicationExists(const std::string& _lpApplicationName);
+
         PlatformProcess(const std::string& _lpApplicationName, const std::vector<std::string>& vector_argv, int _force_horrible_terminate_after_ms = 5000
         #if defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
             ,UnixPipe *pipe_stdin = NULL, UnixPipe *pipe_stdout = NULL, UnixPipe *pipe_stderr = NULL

@@ -8,6 +8,50 @@ extern char **environ;
 namespace aRibeiro
 {
 
+    bool PlatformProcess::ApplicationExists(const std::string& _lpApplicationName) {
+#if defined(_WIN32)
+        return PlatformPath::isFile(lpApplicationName);
+#else
+        std::string app_name = _lpApplicationName;
+        if (!PlatformPath::isFile(app_name))
+        {
+            // search executable in path variable
+            char *dup = strdup(getenv("PATH"));
+            char *s = dup;
+            char *p = NULL;
+            do
+            {
+                p = strchr(s, ':');
+                if (p != NULL)
+                {
+                    p[0] = 0;
+                }
+                std::string exe_path = std::string(s) + PlatformPath::SEPARATOR + app_name;
+                if (PlatformPath::isFile(exe_path))
+                {
+                    // check can execute
+                    struct stat st;
+                    if (stat(exe_path.c_str(), &st) >= 0)
+                    {
+                        if ((st.st_mode & S_IEXEC) != 0)
+                        {
+                            printf("[PlatformProcess:ApplicationExists] Executable found at: %s\n", exe_path.c_str());
+                            app_name = exe_path;
+                            return true;
+                            break;
+                        }
+                    }
+                }
+                s = p + 1;
+            } while (p != NULL);
+            free(dup);
+        } else
+            return true;
+        
+        return false;
+#endif
+    }
+
     PlatformProcess::PlatformProcess(const std::string &_lpApplicationName, const std::vector<std::string> &vector_argv, int _force_horrible_terminate_after_ms
 #if defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
                                      ,
@@ -97,7 +141,7 @@ namespace aRibeiro
                     {
                         if ((st.st_mode & S_IEXEC) != 0)
                         {
-                            printf("Executable found at: %s\n", exe_path.c_str());
+                            printf("[PlatformProcess] Executable found at: %s\n", exe_path.c_str());
                             lpApplicationName = exe_path;
                             break;
                         }
