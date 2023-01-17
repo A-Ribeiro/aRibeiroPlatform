@@ -13,20 +13,26 @@ namespace aRibeiro
         if (fd == STDOUT_FILENO | fd == STDERR_FILENO)
         {
             int o_fd = open("/dev/null", O_WRONLY);
-            if (o_fd != -1){
+            if (o_fd != -1)
+            {
                 dup2(o_fd, fd);
                 close(o_fd);
-            }else {
+            }
+            else
+            {
                 perror("SinkStdFD STDOUT/STDERR...\n");
             }
         }
         else if (fd == STDIN_FILENO)
         {
             int o_fd = open("/dev/null", O_RDONLY);
-            if (o_fd != -1){
+            if (o_fd != -1)
+            {
                 dup2(o_fd, fd);
                 close(o_fd);
-            }else {
+            }
+            else
+            {
                 perror("SinkStdFD STDIN...\n");
             }
         }
@@ -151,13 +157,13 @@ namespace aRibeiro
     void UnixPipe::setReadBlocking(bool v)
     {
         auto flags = fcntl(read_fd, F_GETFL);
-        fcntl(read_fd, F_SETFL, (v) ? (flags | O_NONBLOCK) : (flags & ~O_NONBLOCK));
+        fcntl(read_fd, F_SETFL, (v) ? (flags & ~O_NONBLOCK) : (flags | O_NONBLOCK));
     }
 
     void UnixPipe::setWriteBlocking(bool v)
     {
         auto flags = fcntl(write_fd, F_GETFL);
-        fcntl(write_fd, F_SETFL, (v) ? (flags | O_NONBLOCK) : (flags & ~O_NONBLOCK));
+        fcntl(write_fd, F_SETFL, (v) ? (flags & ~O_NONBLOCK) : (flags | O_NONBLOCK));
     }
 
     bool UnixPipe::isReadFDClosed()
