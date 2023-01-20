@@ -10,7 +10,7 @@ namespace aRibeiro
 
     bool PlatformProcess::ApplicationExists(const std::string& _lpApplicationName) {
 #if defined(_WIN32)
-        return PlatformPath::isFile(lpApplicationName);
+        return PlatformPath::isFile(_lpApplicationName);
 #else
         std::string app_name = _lpApplicationName;
         if (!PlatformPath::isFile(app_name))
@@ -68,7 +68,7 @@ namespace aRibeiro
 
 #if defined(_WIN32)
 
-        findAndReplaceAll(&lpApplicationName, "/", PlatformPath::SEPARATOR);
+        aRibeiro::StringUtil::replaceAll(&lpApplicationName, "/", PlatformPath::SEPARATOR);
 
         if (lpApplicationName.find(".") == std::string::npos)
             lpApplicationName += ".exe";
