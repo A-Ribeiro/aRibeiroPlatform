@@ -53,7 +53,9 @@ namespace aRibeiro
     }
 
     PlatformProcess::PlatformProcess(const std::string &_lpApplicationName, const std::vector<std::string> &vector_argv, int _force_horrible_terminate_after_ms
-#if defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
+#if defined(OS_TARGET_win)
+        , WindowsPipe* pipe_stdin, WindowsPipe* pipe_stdout, WindowsPipe* pipe_stderr
+#elif defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
                                      ,
                                      UnixPipe *pipe_stdin, UnixPipe *pipe_stdout, UnixPipe *pipe_stderr
 #endif
@@ -96,12 +98,26 @@ namespace aRibeiro
         startupInfo.cb = sizeof(startupInfo);
         ZeroMemory(&processInformation, sizeof(processInformation));
 
+
+        startupInfo.hStdInput = NULL;//read from pipe
+        startupInfo.hStdOutput = NULL;//write to pipe
+        startupInfo.hStdError = NULL;//write to pipe
+
+        if (pipe_stdin!=NULL)
+            startupInfo.hStdInput = pipe_stdin->read_fd;//read from pipe
+        if (pipe_stdout != NULL)
+            startupInfo.hStdOutput = pipe_stdout->write_fd;//write to pipe
+        if (pipe_stderr != NULL)
+            startupInfo.hStdError = pipe_stderr->write_fd;//write to pipe
+
+        startupInfo.dwFlags |= STARTF_USESTDHANDLES;
+
         // start the program up
         process_created = CreateProcess(NULL,                   //(LPCTSTR)lpApplicationName.c_str(),   // the path
                                         (LPSTR)&commandLine[0], // Command line
                                         NULL,                   // Process handle not inheritable
                                         NULL,                   // Thread handle not inheritable
-                                        FALSE,                  // Set handle inheritance to FALSE
+                                        TRUE,                  // Set handle inheritance to FALSE
                                         0,                      // CREATE_NEW_PROCESS_GROUP, // No creation flags // CREATE_NEW_CONSOLE |
                                         NULL,                   // Use parent's environment block
                                         NULL,                   // Use parent's starting directory
@@ -114,6 +130,15 @@ namespace aRibeiro
             char aux[64];
             sprintf(aux, "p%u", processInformation.dwProcessId);
             pid_str = aux;
+
+
+            if (pipe_stdin != NULL)
+                pipe_stdin->closeReadFD();//read from pipe
+            if (pipe_stdout != NULL)
+                pipe_stdout->closeWriteFD();//write to pipe
+            if (pipe_stderr != NULL)
+                pipe_stderr->closeWriteFD();//write to pipe
+
         }
 
 #elif defined(OS_TARGET_linux) || defined(OS_TARGET_mac)

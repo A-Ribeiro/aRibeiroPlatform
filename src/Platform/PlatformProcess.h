@@ -12,7 +12,11 @@
 #include <algorithm>
 #include <signal.h>
 
-#if defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
+#if defined(OS_TARGET_win)
+
+#include <aRibeiroPlatform/WindowsPipe.h>
+
+#elif defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
 
 #include <sys/wait.h>
 #include <aRibeiroPlatform/UnixPipe.h>
@@ -106,9 +110,11 @@ namespace aRibeiro {
         static bool ApplicationExists(const std::string& _lpApplicationName);
 
         PlatformProcess(const std::string& _lpApplicationName, const std::vector<std::string>& vector_argv, int _force_horrible_terminate_after_ms = 5000
-        #if defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
+#if defined(OS_TARGET_win)
+            , WindowsPipe* pipe_stdin = NULL, WindowsPipe* pipe_stdout = NULL, WindowsPipe* pipe_stderr = NULL
+#elif defined(OS_TARGET_linux) || defined(OS_TARGET_mac)
             ,UnixPipe *pipe_stdin = NULL, UnixPipe *pipe_stdout = NULL, UnixPipe *pipe_stderr = NULL
-        #endif
+#endif
         );
         bool waitExit(int* exit_code, uint32_t timeout_ms);
         int getExitCode();
