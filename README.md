@@ -69,4 +69,4 @@ software. He worked with OpenGL, post-processing, out-of-core rendering, Unity3D
 he work with freelance projects related to Computer Graphics, Virtual Reality, Augmented Reality, WebGL, web server 
 and mobile apps (andoid/iOS).
 
-More information on: https://alessandroribeiro.thegeneralsolution.com/
+More information on: https://alessandroribeiro.thegeneralsolution.com/en/
